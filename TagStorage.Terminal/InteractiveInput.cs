@@ -2,23 +2,25 @@
 
 namespace TagStorage.Terminal;
 
-public class InteractiveInput(Func<string, IEnumerable<string>> onChange, string prompt = "> ")
+public class InteractiveInput<T>(Func<string, IEnumerable<T>> onChange, Func<T, string> printTransform, string prompt = "> ")
 {
 	private const int max_display_lines = 10;
 
 	private readonly StringBuilder inputBuffer = new StringBuilder();
 	private int cursorLeft = 0;
 
+	private IEnumerable<T> changed = [];
 	private IEnumerable<string> changedLines = [];
 	private int lineStart = 0;
 
 	private void invokeChange()
 	{
 		lineStart = 0;
-		changedLines = onChange(inputBuffer.ToString());
+		changed = onChange(inputBuffer.ToString());
+		changedLines = changed.Select(printTransform);
 	}
 
-	public string ReadInput()
+	public T? ReadInput()
 	{
 		while (true)
 		{
@@ -39,7 +41,7 @@ public class InteractiveInput(Func<string, IEnumerable<string>> onChange, string
 			if (key.Key == ConsoleKey.Enter)
 			{
 				Console.Clear();
-				return readInput;
+				return changed.Skip(lineStart).FirstOrDefault();
 			}
 
 			if (key.Key == ConsoleKey.Backspace)
