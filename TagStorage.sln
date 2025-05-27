@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TagStorage.Library", "TagStorage.Library\TagStorage.Library.csproj", "{A25063F7-3F5D-4156-BE85-42B8805B8DC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TagStorage.Console", "TagStorage.Console\TagStorage.Console.csproj", "{B911567E-D4E9-4DE4-B5C7-1DD75340FDCD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TagStorage.Terminal", "TagStorage.Terminal\TagStorage.Terminal.csproj", "{B911567E-D4E9-4DE4-B5C7-1DD75340FDCD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TagStorage.Tests", "TagStorage.Tests\TagStorage.Tests.csproj", "{394939CD-7693-410B-BB78-6DBCFB8A0A87}"
 EndProject
