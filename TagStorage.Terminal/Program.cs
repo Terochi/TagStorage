@@ -8,10 +8,15 @@ public static class Program
 	{
 		var interactiveInput = new InteractiveInput<TagEntity>(
 			repository.Get,
-			t => t.Name,
+			printTransform,
 			prompt);
 
 		return interactiveInput.ReadInput();
+	}
+
+	private static string printTransform(TagEntity t)
+	{
+		return t.Name;
 	}
 
 	public static void PrintGraphViz(DatabaseConnection db)
@@ -58,6 +63,8 @@ public static class Program
 			Console.WriteLine("'F' to find a tag");
 			Console.WriteLine("'L' to link two tags");
 			Console.WriteLine("'P' to print diagraph");
+			Console.WriteLine("'C' to print child tags of a tag");
+			Console.WriteLine("'N' to print nested tags of a tag");
 			Console.WriteLine("'Q' to quit.");
 
 			ConsoleKeyInfo key = Console.ReadKey(true);
@@ -114,6 +121,44 @@ public static class Program
 				TagEntity? tag = SelectTag(tagRepository);
 
 				Console.WriteLine(tag == null ? "No tag found." : $"Found tag: {tag.Name}");
+			}
+
+			if (key.Key == ConsoleKey.C)
+			{
+				TagEntity? parent = SelectTag(tagRepository, "Select parent tag: ");
+
+				if (parent != null)
+				{
+					Console.WriteLine($"Child tags of '{parent.Name}':");
+
+					foreach (TagEntity child in tagRepository.GetChildTags(parent.Id))
+					{
+						Console.WriteLine($"- {child.Name}");
+					}
+				}
+				else
+				{
+					Console.WriteLine("No tag selected.");
+				}
+			}
+
+			if (key.Key == ConsoleKey.N)
+			{
+				TagEntity? parent = SelectTag(tagRepository, "Select parent tag: ");
+
+				if (parent != null)
+				{
+					Console.WriteLine($"Child tags of '{parent.Name}':");
+
+					foreach (TagEntity child in tagRepository.GetNestedChildTags(parent.Id))
+					{
+						Console.WriteLine($"- {child.Name}");
+					}
+				}
+				else
+				{
+					Console.WriteLine("No tag selected.");
+				}
 			}
 
 			if (key.Key == ConsoleKey.P)
