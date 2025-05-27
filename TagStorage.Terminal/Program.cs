@@ -1,4 +1,5 @@
 ﻿using TagStorage.Library;
+using TagStorage.Library.Entities;
 
 namespace TagStorage.Terminal;
 

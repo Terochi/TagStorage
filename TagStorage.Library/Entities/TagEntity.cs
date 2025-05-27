@@ -1,4 +1,4 @@
-﻿namespace TagStorage.Library;
+﻿namespace TagStorage.Library.Entities;
 
 public class TagEntity
 {

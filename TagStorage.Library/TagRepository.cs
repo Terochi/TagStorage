@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using TagStorage.Library.Entities;
 using TagStorage.Library.Helper;
 
 namespace TagStorage.Library;
