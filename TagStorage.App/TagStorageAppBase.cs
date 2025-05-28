@@ -7,7 +7,7 @@ using TagStorage.Resources;
 
 namespace TagStorage.App
 {
-    public partial class TagGameBase : osu.Framework.Game
+    public partial class TagStorageAppBase : osu.Framework.Game
     {
         // Anything in this class is shared between the test browser and the game implementation.
         // It allows for caching global dependencies that should be accessible to tests, or changing
@@ -15,7 +15,7 @@ namespace TagStorage.App
 
         protected override Container<Drawable> Content { get; }
 
-        protected TagGameBase()
+        protected TagStorageAppBase()
         {
             // Ensure game and tests scale with window size and screen DPI.
             base.Content.Add(Content = new DrawSizePreservingFillContainer
@@ -28,7 +28,7 @@ namespace TagStorage.App
         [BackgroundDependencyLoader]
         private void load()
         {
-            Resources.AddStore(new DllResourceStore(typeof(TagResources).Assembly));
+            Resources.AddStore(new DllResourceStore(TagResources.ResourceAssembly));
         }
     }
 }

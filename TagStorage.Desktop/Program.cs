@@ -1,6 +1,5 @@
 ﻿using osu.Framework;
 using osu.Framework.Platform;
-using TagStorage.App;
 
 namespace TagStorage.Desktop
 {
@@ -9,7 +8,7 @@ namespace TagStorage.Desktop
         public static void Main()
         {
             using (GameHost host = Host.GetSuitableDesktopHost(@"Tag"))
-            using (osu.Framework.Game game = new TagGame())
+            using (Game game = new App.TagStorageApp())
                 host.Run(game);
         }
     }

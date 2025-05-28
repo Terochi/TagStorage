@@ -5,7 +5,7 @@ using osu.Framework.Testing;
 
 namespace TagStorage.App.Tests
 {
-    public partial class TagTestBrowser : TagGameBase
+    public partial class TagStorageTestBrowser : TagStorageAppBase
     {
         protected override void LoadComplete()
         {

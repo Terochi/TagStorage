@@ -8,7 +8,7 @@ namespace TagStorage.App.Tests
         public static void Main()
         {
             using (GameHost host = Host.GetSuitableDesktopHost("visual-tests"))
-            using (var game = new TagTestBrowser())
+            using (var game = new TagStorageTestBrowser())
                 host.Run(game);
         }
     }

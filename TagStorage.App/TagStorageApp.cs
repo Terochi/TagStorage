@@ -4,7 +4,7 @@ using osu.Framework.Screens;
 
 namespace TagStorage.App
 {
-    public partial class TagGame : TagGameBase
+    public partial class TagStorageApp : TagStorageAppBase
     {
         private ScreenStack screenStack;
 

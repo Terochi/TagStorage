@@ -5,3 +5,4 @@ obj/
 /packages/
 /_ReSharper.Caches/
 riderModule.iml
+*.user
