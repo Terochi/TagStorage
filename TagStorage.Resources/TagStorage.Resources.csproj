@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <RootNamespace>TagStorage.Resources</RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Fonts\**\*"/>
+        <EmbeddedResource Include="Samples\**\*"/>
+        <EmbeddedResource Include="Textures\**\*"/>
+        <EmbeddedResource Include="Tracks\**\*"/>
+    </ItemGroup>
+</Project>

@@ -2,24 +2,24 @@
 
 public static class StringSearch
 {
-	public static bool FuzzyMatch(this string text, string pattern)
-	{
-		if (string.IsNullOrEmpty(pattern))
-			return false;
+    public static bool FuzzyMatch(this string text, string pattern)
+    {
+        if (string.IsNullOrEmpty(pattern))
+            return false;
 
-		int patternIndex = 0;
-		int textIndex = 0;
+        int patternIndex = 0;
+        int textIndex = 0;
 
-		while (patternIndex < pattern.Length && textIndex < text.Length)
-		{
-			if (char.ToLower(pattern[patternIndex]) == char.ToLower(text[textIndex]))
-			{
-				patternIndex++;
-			}
+        while (patternIndex < pattern.Length && textIndex < text.Length)
+        {
+            if (char.ToLower(pattern[patternIndex]) == char.ToLower(text[textIndex]))
+            {
+                patternIndex++;
+            }
 
-			textIndex++;
-		}
+            textIndex++;
+        }
 
-		return patternIndex == pattern.Length;
-	}
+        return patternIndex == pattern.Length;
+    }
 }
