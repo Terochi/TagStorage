@@ -19,16 +19,12 @@ namespace TagStorage.App
         {
             if (e.Key == Key.BackSpace)
             {
+                if (string.IsNullOrWhiteSpace(path))
+                    return true;
+
                 var directoryInfo = System.IO.Directory.GetParent(path);
 
-                if (directoryInfo != null)
-                {
-                    loadDirectory(directoryInfo.FullName);
-                }
-                else
-                {
-                    loadDirectory("");
-                }
+                loadDirectory(directoryInfo != null ? directoryInfo.FullName : "");
 
                 return true;
             }
@@ -77,14 +73,7 @@ namespace TagStorage.App
                     Colour = Colour4.FromHex("FFE99A"),
                     Action = () =>
                     {
-                        if (string.IsNullOrWhiteSpace(path))
-                        {
-                            loadDirectory(name);
-                        }
-                        else
-                        {
-                            loadDirectory(Path.Combine(path, name));
-                        }
+                        loadDirectory(string.IsNullOrWhiteSpace(path) ? name : Path.Combine(path, name));
                     }
                 });
             }

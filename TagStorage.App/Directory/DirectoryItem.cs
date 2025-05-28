@@ -94,9 +94,11 @@ public partial class DirectoryItem : Container
         text = new SpriteText
         {
             X = 25,
+            Width = 200,
             Font = FontUsage.Default.With(size: 15),
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft,
+            Truncate = true
         };
     }
 
