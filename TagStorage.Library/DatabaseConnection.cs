@@ -53,8 +53,8 @@ public class DatabaseConnection
 			);
 			create table if not exists tag_parent_of
 			(
-				child  integer references tags,
-				parent integer references tags,
+				child  integer references tags on delete cascade,
+				parent integer references tags on delete cascade,
 				primary key (child, parent)
 			);
 			""");
