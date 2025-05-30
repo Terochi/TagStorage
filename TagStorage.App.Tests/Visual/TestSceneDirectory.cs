@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osuTK;
-using TagStorage.App.Directory;
+using TagStorage.App.DirectoryBrowser;
 
 namespace TagStorage.App.Tests.Visual
 {

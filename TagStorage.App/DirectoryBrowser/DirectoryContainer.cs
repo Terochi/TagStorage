@@ -4,7 +4,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 
-namespace TagStorage.App.Directory;
+namespace TagStorage.App.DirectoryBrowser;
 
 public partial class DirectoryContainer : Container<DirectoryItem>
 {

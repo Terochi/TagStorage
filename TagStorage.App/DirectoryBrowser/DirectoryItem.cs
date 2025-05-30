@@ -11,7 +11,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osuTK;
 
-namespace TagStorage.App.Directory;
+namespace TagStorage.App.DirectoryBrowser;
 
 public partial class DirectoryItem : Container
 {
@@ -95,7 +95,7 @@ public partial class DirectoryItem : Container
         {
             X = 25,
             Width = 200,
-            Font = FontUsage.Default.With(size: 15),
+            Font = FrameworkFont.Condensed,
             Anchor = Anchor.CentreLeft,
             Origin = Anchor.CentreLeft,
             Truncate = true
@@ -157,7 +157,7 @@ public partial class DirectoryItem : Container
             new Container
             {
                 AutoSizeAxes = Axes.Both,
-                Padding = new MarginPadding() { Left = 5, Right = 5 },
+                Padding = new MarginPadding { Left = 5, Right = 5 },
                 Children =
                 [
                     icon,

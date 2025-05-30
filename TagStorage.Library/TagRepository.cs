@@ -11,7 +11,8 @@ public class TagRepository(DatabaseConnection db)
         return new TagEntity
         {
             Id = reader.GetInt32(0),
-            Name = reader.GetString(1)
+            Name = reader.GetString(1),
+            Color = reader.IsDBNull(2) ? null : reader.GetString(2),
         };
     }
 
@@ -32,7 +33,7 @@ public class TagRepository(DatabaseConnection db)
 
     public TagEntity Add(string name)
     {
-        return db.ExecuteQuery($"INSERT INTO tags (name) VALUES ('{name}') RETURNING id, name;", tagMapFunction)
+        return db.ExecuteQuery($"INSERT INTO tags (name) VALUES ('{name}') RETURNING *;", tagMapFunction)
                  .First();
     }
 

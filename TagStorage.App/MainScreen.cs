@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osuTK.Input;
-using TagStorage.App.Directory;
+using TagStorage.App.DirectoryBrowser;
 
 namespace TagStorage.App
 {
@@ -22,7 +22,7 @@ namespace TagStorage.App
                 if (string.IsNullOrWhiteSpace(path))
                     return true;
 
-                var directoryInfo = System.IO.Directory.GetParent(path);
+                var directoryInfo = Directory.GetParent(path);
 
                 loadDirectory(directoryInfo != null ? directoryInfo.FullName : "");
 
@@ -53,13 +53,13 @@ namespace TagStorage.App
 
             if (string.IsNullOrWhiteSpace(path))
             {
-                directories = System.IO.Directory.GetLogicalDrives();
+                directories = Directory.GetLogicalDrives();
                 files = [];
             }
             else
             {
-                directories = System.IO.Directory.GetDirectories(path);
-                files = System.IO.Directory.GetFiles(path);
+                directories = Directory.GetDirectories(path);
+                files = Directory.GetFiles(path);
             }
 
             foreach (string directory in directories)

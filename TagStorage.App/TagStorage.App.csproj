@@ -4,6 +4,7 @@
         <RootNamespace>TagStorage.App</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
+        <ProjectReference Include="..\TagStorage.Library\TagStorage.Library.csproj" />
         <ProjectReference Include="..\TagStorage.Resources\TagStorage.Resources.csproj" />
     </ItemGroup>
     <ItemGroup>

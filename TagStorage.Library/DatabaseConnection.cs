@@ -49,7 +49,8 @@ public class DatabaseConnection
             create table if not exists tags
             (
             	id   integer primary key not null,
-            	name text
+            	name text,
+            	color text
             );
             create table if not exists tag_parent_of
             (
