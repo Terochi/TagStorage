@@ -12,6 +12,16 @@ namespace TagStorage.App.Tests.Visual
     {
         public TestSceneSelector()
         {
+            var dirs = new DirectorySelectionContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+
+            foreach (string dir in new[] { "yes", "ye", "ns", "ys", "yhgs" })
+            {
+                dirs.AddBlueprintFor(dir);
+            }
+
             Add(new Container
             {
                 Anchor = Anchor.Centre,
@@ -24,20 +34,16 @@ namespace TagStorage.App.Tests.Visual
                         RelativeSizeAxes = Axes.Both,
                         Colour = Colour4.Gray,
                     },
-                    new SelectorContainer<TestSelectItem, string>()
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new[]
-                        {
-                            new TestSelectItem(),
-                            new TestSelectItem(),
-                            new TestSelectItem(),
-                            new TestSelectItem(),
-                            new TestSelectItem(),
-                        }
-                    }
+                    dirs
                 ]
             });
+
+            // Process.Start(new ProcessStartInfo
+            // {
+            //     FileName = "C:\\",
+            //     UseShellExecute = true,
+            //     Verb = "open"
+            // });
         }
     }
 }

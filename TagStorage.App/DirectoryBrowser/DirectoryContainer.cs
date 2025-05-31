@@ -2,29 +2,22 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Textures;
+using TagStorage.App.Selector;
 
 namespace TagStorage.App.DirectoryBrowser;
 
-public partial class DirectoryContainer : Container<DirectoryItem>
+public partial class DirectoryContainer : CompositeDrawable
 {
     public DirectoryContainer()
     {
         Masking = true;
         CornerRadius = 10;
-
-        Content = new FillFlowContainer<DirectoryItem>
-        {
-            Direction = FillDirection.Vertical,
-            RelativeSizeAxes = Axes.X,
-            AutoSizeAxes = Axes.Y,
-        };
     }
 
-    protected override FillFlowContainer<DirectoryItem> Content { get; }
+    public DirectorySelectionContainer DirectorySelectionContainer { get; private set; }
 
     [BackgroundDependencyLoader]
-    private void load(TextureStore textures)
+    private void load()
     {
         InternalChildren =
         [
@@ -39,7 +32,11 @@ public partial class DirectoryContainer : Container<DirectoryItem>
                 DistanceDecayScroll = 1f,
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding(20),
-                Child = Content,
+                Child = DirectorySelectionContainer = new DirectorySelectionContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                }
             }
         ];
     }
