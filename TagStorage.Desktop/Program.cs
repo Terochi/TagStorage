@@ -7,7 +7,7 @@ namespace TagStorage.Desktop
     {
         public static void Main()
         {
-            using (GameHost host = Host.GetSuitableDesktopHost(@"Tag"))
+            using (GameHost host = Host.GetSuitableDesktopHost(@"TagStorage"))
             using (Game game = new App.TagStorageApp())
                 host.Run(game);
         }

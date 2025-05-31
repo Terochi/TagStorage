@@ -8,16 +8,11 @@ namespace TagStorage.App.TagBrowser;
 
 public partial class TagList : FillFlowContainer<Tag>
 {
-    [Cached]
-    private DatabaseConnection db { get; set; }
-
-    [Cached]
+    [Resolved]
     private TagRepository tags { get; set; }
 
     public TagList()
     {
-        db = new DatabaseConnection();
-        tags = new TagRepository(db);
     }
 
     [BackgroundDependencyLoader]

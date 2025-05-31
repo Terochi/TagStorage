@@ -15,6 +15,8 @@ namespace TagStorage.App
 
         protected override Container<Drawable> Content { get; }
 
+        private DependencyContainer dependencies;
+
         protected TagStorageAppBase()
         {
             // Ensure game and tests scale with window size and screen DPI.
@@ -29,6 +31,16 @@ namespace TagStorage.App
         private void load()
         {
             Resources.AddStore(new DllResourceStore(TagResources.ResourceAssembly));
+
+            string dbPath = Host.Storage.GetFullPath("tagStorage.db", true);
+
+            var db = new Library.DatabaseConnection(dbPath);
+            dependencies.CacheAs(db);
+            var tags = new Library.TagRepository(db);
+            dependencies.CacheAs(tags);
         }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
     }
 }

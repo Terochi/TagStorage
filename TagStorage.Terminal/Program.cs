@@ -55,7 +55,7 @@ public static class Program
 
     public static void Main(string[] args)
     {
-        var db = new DatabaseConnection();
+        var db = new DatabaseConnection("tagStorage.db");
         var tagRepository = new TagRepository(db);
 
         while (true)

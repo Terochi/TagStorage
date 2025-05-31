@@ -5,14 +5,11 @@ namespace TagStorage.Library;
 
 public class DatabaseConnection
 {
-    private const string database_file_name = "tagStorage.db";
-    private static string connectionString => $"Data Source={database_file_name};";
-
     private readonly IDbConnection db;
 
-    public DatabaseConnection()
+    public DatabaseConnection(string path)
     {
-        db = new SqliteConnection(connectionString);
+        db = new SqliteConnection($"Data Source={path};");
         db.Open();
         createDatabaseIfNotExists();
     }
