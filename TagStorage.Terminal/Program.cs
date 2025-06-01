@@ -28,9 +28,9 @@ public static class Program
                  db.ExecuteQuery<Tuple<int, string, int?, string?>>(
                      """
                      SELECT children.id, children.name, parents.id, parents.name
-                     FROM tag_parent_of
-                         LEFT JOIN tags children ON tag_parent_of.child = children.id
-                         LEFT JOIN tags parents ON tag_parent_of.parent = parents.id
+                     FROM tag_children
+                         LEFT JOIN tags children ON tag_children.child = children.id
+                         LEFT JOIN tags parents ON tag_children.parent = parents.id
                      """,
                      r =>
                      {
