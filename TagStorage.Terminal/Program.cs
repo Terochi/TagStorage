@@ -1,5 +1,6 @@
 ﻿using TagStorage.Library;
 using TagStorage.Library.Entities;
+using TagStorage.Library.Helper;
 using TagStorage.Library.Repository;
 
 namespace TagStorage.Terminal;
@@ -56,6 +57,16 @@ public static class Program
 
     public static void Main(string[] args)
     {
+        Console.Write("Choose dir: ");
+        string dir = Console.ReadLine() ?? string.Empty;
+
+        if (Directory.Exists(dir))
+        {
+            var footprint = DirectoryUtils.CreateHash(new DirectoryInfo(dir));
+            Console.WriteLine(footprint);
+        }
+
+        return;
         var db = new DatabaseConnection("tagStorage.db");
         var tagRepository = new TagRepository(db);
         var tagChildRepository = new TagChildRepository(db);
