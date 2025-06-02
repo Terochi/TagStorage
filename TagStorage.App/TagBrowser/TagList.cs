@@ -1,8 +1,8 @@
 ﻿using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using TagStorage.Library;
 using TagStorage.Library.Entities;
+using TagStorage.Library.Repository;
 
 namespace TagStorage.App.TagBrowser;
 

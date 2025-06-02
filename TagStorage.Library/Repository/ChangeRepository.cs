@@ -1,0 +1,19 @@
+﻿using System.Data;
+using TagStorage.Library.Entities;
+
+namespace TagStorage.Library.Repository;
+
+public class ChangeRepository(DatabaseConnection connection) : BaseRepository<ChangeEntity>(connection)
+{
+    protected override string TableName => "changes";
+
+    protected override ChangeEntity MapEntity(IDataReader reader) =>
+        new ChangeEntity
+        {
+            Id = reader.GetInt32(0),
+            Location = reader.GetInt32(1),
+            Date = reader.GetDateTime(2),
+            Size = reader.GetInt32(3),
+            Hash = reader.GetString(4)
+        };
+}

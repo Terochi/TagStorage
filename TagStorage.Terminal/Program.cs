@@ -1,5 +1,6 @@
 ﻿using TagStorage.Library;
 using TagStorage.Library.Entities;
+using TagStorage.Library.Repository;
 
 namespace TagStorage.Terminal;
 
@@ -57,6 +58,7 @@ public static class Program
     {
         var db = new DatabaseConnection("tagStorage.db");
         var tagRepository = new TagRepository(db);
+        var tagChildRepository = new TagChildRepository(db);
 
         while (true)
         {
@@ -85,14 +87,14 @@ public static class Program
                     continue;
                 }
 
-                TagEntity child = tagRepository.Add(tagName);
+                TagEntity child = tagRepository.Insert(new TagEntity { Name = tagName });
                 Console.WriteLine($"Tag '{child.Name}' added.");
 
                 TagEntity? parent = SelectTag(tagRepository, "Select parent tag: ");
 
                 if (parent != null)
                 {
-                    tagRepository.Link(child.Id, parent.Id);
+                    tagChildRepository.Insert(new TagChildEntity { Child = child.Id, Parent = parent.Id });
                     Console.WriteLine($"Tag '{child.Name}' added as a child of '{parent.Name}'.");
                 }
                 else
@@ -108,7 +110,7 @@ public static class Program
 
                 if (parent != null && child != null)
                 {
-                    tagRepository.Link(child.Id, parent.Id);
+                    tagChildRepository.Insert(new TagChildEntity { Child = child.Id, Parent = parent.Id });
                     Console.WriteLine($"Tag '{child.Name}' added as a child of '{parent.Name}'.");
                 }
                 else

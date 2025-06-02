@@ -3,6 +3,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
 using osuTK;
+using TagStorage.Library;
+using TagStorage.Library.Repository;
 using TagStorage.Resources;
 
 namespace TagStorage.App
@@ -34,9 +36,9 @@ namespace TagStorage.App
 
             string dbPath = Host.Storage.GetFullPath("tagStorage.db", true);
 
-            var db = new Library.DatabaseConnection(dbPath);
+            var db = new DatabaseConnection(dbPath);
             dependencies.CacheAs(db);
-            var tags = new Library.TagRepository(db);
+            var tags = new TagRepository(db);
             dependencies.CacheAs(tags);
         }
 
