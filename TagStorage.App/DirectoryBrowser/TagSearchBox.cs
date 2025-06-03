@@ -75,6 +75,7 @@ public partial class TagSearchBox : CompositeDrawable
     public override void Show()
     {
         textbox.Text = string.Empty;
+        Scheduler.Add(() => GetContainingFocusManager()!.ChangeFocus(textbox));
 
         base.Show();
     }
