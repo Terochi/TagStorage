@@ -13,8 +13,8 @@ public class DirectoryRepository(DatabaseConnection connection) : BaseRepository
             Id = reader.GetInt32(0),
             Type = reader.GetString(1) switch
             {
-                "I" => DirectoryType.Included,
-                "E" => DirectoryType.Excluded,
+                "I" => DirectoryType.I,
+                "E" => DirectoryType.E,
                 _ => throw new ArgumentOutOfRangeException()
             },
             Directory = reader.GetString(2),

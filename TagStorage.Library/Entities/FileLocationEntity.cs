@@ -1,10 +1,9 @@
-﻿using System.ComponentModel;
-
-namespace TagStorage.Library.Entities;
+﻿namespace TagStorage.Library.Entities;
 
 public class FileLocationEntity : IEntity
 {
     public int Id { get; set; }
+    public int File { get; set; }
 
     public FileLocationType Type { get; set; }
     public required string Path { get; set; }
@@ -14,9 +13,6 @@ public class FileLocationEntity : IEntity
 
 public enum FileLocationType
 {
-    [Description("F")]
-    File,
-
-    [Description("D")]
-    Directory,
+    F, // File
+    D, // Directory
 }

@@ -1,4 +1,7 @@
-﻿using osu.Framework.Allocation;
+﻿using System.IO;
+using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -6,15 +9,38 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osuTK;
+using TagStorage.App.TagBrowser;
+using TagStorage.Library.Entities;
+using TagStorage.Library.Repository;
 
 namespace TagStorage.App.Selector;
 
 public partial class DirectorySelectionItem : SelectionItem<string>
 {
+    public Bindable<string> CurrentDirectory { get; set; } = new Bindable<string>();
+    protected virtual IconUsage GetIcon => FontAwesome.Solid.Folder;
+
     [Resolved]
     private GameHost host { get; set; } = null!;
 
+    [Resolved]
+    private TagRepository tags { get; set; }
+
+    [Resolved]
+    private ChangeRepository changes { get; set; }
+
+    [Resolved]
+    private FileRepository files { get; set; }
+
+    [Resolved]
+    private FileLocationRepository fileLocations { get; set; }
+
+    [Resolved]
+    private FileTagRepository fileTags { get; set; }
+
     private Box selection;
+
+    private TagList tagList;
 
     public DirectorySelectionItem(string item)
         : base(item)
@@ -28,29 +54,59 @@ public partial class DirectorySelectionItem : SelectionItem<string>
         Colour = Colour4.White,
     };
 
-    protected override Drawable CreateContent() => new FillFlowContainer
+    protected override Drawable CreateContent()
     {
-        Direction = FillDirection.Horizontal,
-        AutoSizeAxes = Axes.Both,
-        Margin = new MarginPadding(5),
-        Spacing = new Vector2(5),
-        Children =
-        [
-            new SpriteIcon
+        var content = new FillFlowContainer
+        {
+            Direction = FillDirection.Horizontal,
+            AutoSizeAxes = Axes.Both,
+            Margin = new MarginPadding(5),
+            Spacing = new Vector2(5),
+            Children =
+            [
+                new SpriteIcon
+                {
+                    Icon = GetIcon,
+                    Size = new Vector2(20)
+                },
+                new SpriteText
+                {
+                    Width = 200,
+                    Font = FrameworkFont.Condensed,
+                    Text = Item,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                },
+                tagList = new TagList
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.X,
+                }
+            ]
+        };
+        tagList.Clicked += tag =>
+        {
+            foreach (int fileId in fileLocations.GetByPath(Path.Join(CurrentDirectory.Value, Item)).Select(
+                         loc => files.Get(loc.File)!.Id))
             {
-                Icon = FontAwesome.Solid.Folder,
-                Size = new Vector2(20)
-            },
-            new SpriteText
-            {
-                Width = 200,
-                Font = FrameworkFont.Condensed,
-                Text = Item,
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
+                FileTagEntity fileTag = fileTags.Get(new FileTagEntity { File = fileId, Tag = tag.Entity.Id });
+                fileTags.Delete(fileTag);
             }
-        ]
-    };
+
+            LoadTags();
+        };
+        Schedule(LoadTags);
+        return content;
+    }
+
+    public void LoadTags()
+    {
+        var setTags = fileLocations.GetByPath(Path.Join(CurrentDirectory.Value, Item)).Select(
+                                       loc => files.Get(loc.File)!.Id)
+                                   .SelectMany(fileTags.GetByFile)
+                                   .Select(fileTag => tags.Get(fileTag.Tag));
+        tagList.LoadTags(setTags);
+    }
 
     protected override void LoadComplete()
     {
@@ -78,7 +134,7 @@ public partial class DirectorySelectionItem : SelectionItem<string>
 
     private void updateSelection()
     {
-        selection.Alpha = getAlpha();
+        Schedule(() => selection.Alpha = getAlpha());
     }
 
     private float getAlpha()

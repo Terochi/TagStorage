@@ -13,4 +13,16 @@ public class TagChildRepository(DatabaseConnection connection) : BaseRepository<
             Child = reader.GetInt32(0),
             Parent = reader.GetInt32(1)
         };
+
+    public virtual TagChildEntity? Get(TagChildEntity tagChild)
+    {
+        return Connection.ExecuteQuery($"SELECT * FROM {TableName} WHERE child = {tagChild.Child} AND parent = {tagChild.Parent};", MapEntity).FirstOrDefault();
+    }
+
+    public override void Delete(TagChildEntity tagChild)
+    {
+        Connection.ExecuteCommand($"DELETE FROM {TableName} WHERE child = {tagChild.Child} AND parent = {tagChild.Parent};");
+    }
+
+    public virtual bool Exists(TagChildEntity tagChild) => Get(tagChild) != null;
 }

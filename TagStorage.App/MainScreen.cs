@@ -16,10 +16,10 @@ namespace TagStorage.App
         {
             if (e.Key == Key.BackSpace)
             {
-                if (string.IsNullOrWhiteSpace(dir.DirectorySelectionContainer.CurrentDirectory))
+                if (string.IsNullOrWhiteSpace(dir.DirectorySelectionContainer.CurrentDirectory.Value))
                     return true;
 
-                var directoryInfo = Directory.GetParent(dir.DirectorySelectionContainer.CurrentDirectory);
+                var directoryInfo = Directory.GetParent(dir.DirectorySelectionContainer.CurrentDirectory.Value);
 
                 dir.DirectorySelectionContainer.LoadDirectory(directoryInfo != null ? directoryInfo.FullName : "");
 
@@ -40,7 +40,7 @@ namespace TagStorage.App
 
         protected override void LoadComplete()
         {
-            dir.DirectorySelectionContainer.LoadDirectory(dir.DirectorySelectionContainer.CurrentDirectory);
+            dir.DirectorySelectionContainer.LoadDirectory(dir.DirectorySelectionContainer.CurrentDirectory.Value);
 
             base.LoadComplete();
         }

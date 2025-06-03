@@ -11,6 +11,11 @@ public class FileRepository(DatabaseConnection connection) : BaseRepository<File
         new FileEntity
         {
             Id = reader.GetInt32(0),
-            Location = reader.GetInt32(1)
         };
+
+    public override FileEntity Insert(FileEntity entity)
+    {
+        return Connection.ExecuteQuery($"INSERT INTO {TableName} DEFAULT VALUES RETURNING *;", MapEntity)
+                         .First();
+    }
 }

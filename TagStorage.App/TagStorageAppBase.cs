@@ -38,8 +38,15 @@ namespace TagStorage.App
 
             var db = new DatabaseConnection(dbPath);
             dependencies.CacheAs(db);
-            var tags = new TagRepository(db);
-            dependencies.CacheAs(tags);
+            dependencies.CacheAs(new TagRepository(db));
+            dependencies.CacheAs(new ChangeRepository(db));
+            dependencies.CacheAs(new DirectoryRepository(db));
+            dependencies.CacheAs(new FileRepository(db));
+            dependencies.CacheAs(new FileLocationRepository(db));
+            dependencies.CacheAs(new FileTagRepository(db));
+            dependencies.CacheAs(new TaggingRuleRepository(db));
+            dependencies.CacheAs(new TagChildRepository(db));
+            dependencies.CacheAs(new AutomaticTagRepository(db));
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>

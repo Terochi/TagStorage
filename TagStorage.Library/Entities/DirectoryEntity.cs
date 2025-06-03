@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace TagStorage.Library.Entities;
+﻿namespace TagStorage.Library.Entities;
 
 public class DirectoryEntity : IEntity
 {
@@ -11,9 +9,6 @@ public class DirectoryEntity : IEntity
 
 public enum DirectoryType
 {
-    [Description("I")]
-    Included,
-
-    [Description("E")]
-    Excluded,
+    I, // Included
+    E, // Excluded
 }

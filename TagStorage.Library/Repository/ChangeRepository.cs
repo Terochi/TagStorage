@@ -13,7 +13,12 @@ public class ChangeRepository(DatabaseConnection connection) : BaseRepository<Ch
             Id = reader.GetInt32(0),
             Location = reader.GetInt32(1),
             Date = reader.GetDateTime(2),
-            Size = reader.GetInt32(3),
+            Size = reader.GetInt64(3),
             Hash = reader.GetString(4)
         };
+
+    public IEnumerable<ChangeEntity> FindDuplicates(ChangeEntity entity)
+    {
+        return Connection.ExecuteQuery($"SELECT * FROM {TableName} WHERE size = {entity.Size} AND hash = '{entity.Hash}';", MapEntity);
+    }
 }

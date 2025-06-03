@@ -63,12 +63,12 @@ public class DatabaseConnection
             );
             create table if not exists files
             (
-                id       integer primary key not null,
-                location integer references file_locations on delete cascade
+                id integer primary key not null
             );
             create table if not exists file_locations
             (
                 id      integer primary key not null,
+                file    integer references files on delete cascade,
                 type    text CHECK(type IN ('F','D')) not null default 'F', -- File/Directory
             	path    text,
                 machine text,
@@ -79,8 +79,8 @@ public class DatabaseConnection
                 id       integer primary key not null,
                 location integer references file_locations on delete cascade,
                 date     datetime not null,
-                size    integer,
-                hash    text
+                size     integer,
+                hash     text
             );
 
             create table if not exists tagging_rules

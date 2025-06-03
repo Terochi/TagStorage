@@ -1,13 +1,45 @@
-﻿using osu.Framework.Allocation;
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
+using osu.Framework.Logging;
+using osuTK;
 using TagStorage.App.Selector;
+using TagStorage.Library.Entities;
+using TagStorage.Library.Helper;
+using TagStorage.Library.Repository;
 
 namespace TagStorage.App.DirectoryBrowser;
 
 public partial class DirectoryContainer : CompositeDrawable
 {
+    [Resolved]
+    private TagRepository tags { get; set; }
+
+    [Resolved]
+    private ChangeRepository changes { get; set; }
+
+    [Resolved]
+    private FileRepository files { get; set; }
+
+    [Resolved]
+    private FileLocationRepository fileLocations { get; set; }
+
+    [Resolved]
+    private FileTagRepository fileTags { get; set; }
+
+    public override bool RequestsFocus => true;
+    public override bool AcceptsFocus => true;
+
+    private TagSearchBox search;
+
     public DirectoryContainer()
     {
         Masking = true;
@@ -37,7 +69,144 @@ public partial class DirectoryContainer : CompositeDrawable
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                 }
+            },
+            search = new TagSearchBox
+            {
+                Alpha = 0f,
+                Position = new Vector2(300, 50)
             }
         ];
+
+        DirectorySelectionContainer.AddTag += tags =>
+        {
+            if (DirectorySelectionContainer.SelectedBlueprints.Count == 0) return;
+
+            search.Show();
+        };
+
+        search.OnCommit += onCommit;
+
+        DirectorySelectionContainer.SelectedItems.BindCollectionChanged((_, _) =>
+        {
+            search.Hide();
+        });
+    }
+
+    private void onCommit(TextBox sender, bool newText)
+    {
+        TagEntity? tag = tags.Get(sender.Text).FirstOrDefault();
+
+        if (tag == null)
+        {
+            Colour4 newColor = Colour4.FromHSL(Random.Shared.NextSingle(), Random.Shared.NextSingle() * 0.56f + 0.42f, Random.Shared.NextSingle() * 0.5f + 0.4f);
+            tag = tags.Insert(new TagEntity { Color = newColor.ToHex(), Name = sender.Text });
+        }
+
+        foreach (string name in DirectorySelectionContainer.SelectedItems)
+        {
+            string fullName = Path.Join(DirectorySelectionContainer.CurrentDirectory.Value, name);
+            string machineName = Environment.MachineName;
+
+            string hash;
+            long size;
+            FileLocationType type;
+            DateTime lastModified;
+
+            if (Directory.Exists(fullName))
+            {
+                var directoryInfo = new DirectoryInfo(fullName);
+                lastModified = DateTime.UtcNow;
+                (hash, size) = DirectoryUtils.CreateHash(directoryInfo);
+                type = FileLocationType.D;
+            }
+            else
+            {
+                var fileInfo = new FileInfo(fullName);
+                lastModified = fileInfo.LastWriteTimeUtc;
+                (hash, size) = DirectoryUtils.CreateHash(fileInfo);
+                type = FileLocationType.F;
+            }
+
+            FileEntity file;
+            FileLocationEntity? location = fileLocations.GetByPath(fullName).FirstOrDefault(l => l.Machine == machineName);
+
+            if (location == null)
+            {
+                file = files.Insert(new FileEntity());
+                location = fileLocations.Insert(new FileLocationEntity
+                {
+                    File = file.Id,
+                    Machine = machineName,
+                    Path = fullName,
+                    Type = type,
+                });
+            }
+            else if (location.Type != type)
+            {
+                Logger.Log($"File type does not match with existing {location.Path}", level: LogLevel.Error);
+                continue;
+            }
+            else
+            {
+                file = files.Get(location.File)!;
+            }
+
+            IEnumerable<ChangeEntity> foundChanges = changes.FindDuplicates(new ChangeEntity
+            {
+                Hash = hash,
+                Size = size
+            });
+
+            bool foundIdentical = false;
+
+            if (foundChanges.Any())
+            {
+                Logger.Log($"Found duplicate changes for {location.Path}");
+
+                foreach (ChangeEntity change in foundChanges)
+                {
+                    FileLocationEntity loc = fileLocations.Get(change.Location)!;
+                    Logger.Log($"Duplicate file: {loc.Path}");
+                    foundIdentical |= change.Location == location.Id;
+                }
+                // TODO: More handling for matching with already existing FileEntity...
+            }
+
+            if (!foundIdentical)
+            {
+                changes.Insert(new ChangeEntity
+                {
+                    Hash = hash,
+                    Size = size,
+                    Date = lastModified,
+                    Location = location.Id,
+                });
+            }
+
+            FileTagEntity fileTag = new FileTagEntity
+            {
+                File = file.Id,
+                Tag = tag.Id
+            };
+
+            if (!fileTags.Exists(fileTag))
+            {
+                fileTags.Insert(fileTag);
+            }
+        }
+
+        foreach (DirectorySelectionItem selectedBlueprint in DirectorySelectionContainer.SelectedBlueprints.Cast<DirectorySelectionItem>())
+        {
+            selectedBlueprint.LoadTags();
+        }
+
+        search.Hide();
+    }
+
+    protected override bool OnClick(ClickEvent e)
+    {
+        search.Hide();
+
+        return base.OnClick(e);
     }
 }

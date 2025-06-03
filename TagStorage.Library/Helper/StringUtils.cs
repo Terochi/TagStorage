@@ -8,7 +8,7 @@ public static class StringUtils
     public static bool FuzzyMatch(this string text, string pattern)
     {
         if (string.IsNullOrEmpty(pattern))
-            return false;
+            return true;
 
         int patternIndex = 0;
         int textIndex = 0;

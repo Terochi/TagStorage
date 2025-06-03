@@ -4,6 +4,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK;
 using TagStorage.App.TagBrowser;
+using TagStorage.Library.Entities;
 
 namespace TagStorage.App.Tests.Visual
 {
@@ -33,11 +34,11 @@ namespace TagStorage.App.Tests.Visual
                         Spacing = new Vector2(10),
                         Children =
                         [
-                            new Tag("Anime", Colour4.Red.Darken(0.2f)),
-                            new Tag("Manga", Colour4.Red),
-                            new Tag("One Piece", Colour4.Lime.Darken(0.2f)),
-                            new Tag("Steins;Gate", Colour4.Aqua.Darken(0.2f)),
-                            new Tag("Mushoku Tensei", Colour4.Purple),
+                            new Tag(new TagEntity { Name = "Anime", Color = Colour4.Red.Darken(0.2f).ToHex() }),
+                            new Tag(new TagEntity { Name = "Manga", Color = Colour4.Red.ToHex() }),
+                            new Tag(new TagEntity { Name = "One Piece", Color = Colour4.Lime.Darken(0.2f).ToHex() }),
+                            new Tag(new TagEntity { Name = "Steins;Gate", Color = Colour4.Aqua.Darken(0.2f).ToHex() }),
+                            new Tag(new TagEntity { Name = "Mushoku Tensei", Color = Colour4.Purple.ToHex() }),
                         ]
                     }
                 ]

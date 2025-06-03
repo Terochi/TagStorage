@@ -9,19 +9,23 @@ public static class DirectoryUtils
     private static string shortFormatDate(DateTime dateTime) =>
         dateTime.ToUniversalTime().ToString("yyMMddHHmmss", CultureInfo.InvariantCulture);
 
-    public static string CreateHash(DirectoryInfo directory)
+    public static (string hash, long size) CreateHash(DirectoryInfo directory)
     {
         StringBuilder footprint = new StringBuilder();
         long totalSize = 0;
         addToFootprint(footprint, directory, ref totalSize);
         footprint.Append('=');
         footprint.Append(totalSize);
-        return Convert.ToBase64String(SHA.HashData(Encoding.UTF8.GetBytes(footprint.ToString())), Base64FormattingOptions.None);
+        string hash = Convert.ToBase64String(SHA.HashData(Encoding.UTF8.GetBytes(footprint.ToString())), Base64FormattingOptions.None);
+        return (hash, totalSize);
     }
 
-    public static string CreateHash(FileInfo file)
+    public static (string hash, long size) CreateHash(FileInfo file)
     {
-        return Convert.ToBase64String(SHA.HashData(File.ReadAllBytes(file.FullName)), Base64FormattingOptions.None);
+        using FileStream fs = File.OpenRead(file.FullName);
+        long totalSize = fs.Length;
+        string hash = Convert.ToBase64String(SHA.HashData(fs), Base64FormattingOptions.None);
+        return (hash, totalSize);
     }
 
     private static void addToFootprint(StringBuilder footprint, DirectoryInfo parent, ref long totalSize, int searchedPathLength = 0, Ignore.Ignore? ignore = null)

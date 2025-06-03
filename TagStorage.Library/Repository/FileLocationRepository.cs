@@ -11,13 +11,19 @@ public class FileLocationRepository(DatabaseConnection connection) : BaseReposit
         new FileLocationEntity
         {
             Id = reader.GetInt32(0),
-            Type = reader.GetString(1) switch
+            File = reader.GetInt32(1),
+            Type = reader.GetString(2) switch
             {
-                "F" => FileLocationType.File,
-                "D" => FileLocationType.Directory,
+                "F" => FileLocationType.F,
+                "D" => FileLocationType.D,
                 _ => throw new ArgumentOutOfRangeException()
             },
-            Path = reader.GetString(2),
-            Machine = reader.GetString(3),
+            Path = reader.GetString(3),
+            Machine = reader.GetString(4),
         };
+
+    public IEnumerable<FileLocationEntity> GetByPath(string path)
+    {
+        return Connection.ExecuteQuery($"SELECT * FROM {TableName} WHERE path = '{path}';", MapEntity);
+    }
 }
