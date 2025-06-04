@@ -86,7 +86,7 @@ public class DatabaseConnection
             create table if not exists tagging_rules
             (
                 id   integer primary key not null,
-                name text not null
+                name text not null unique
             );
             create table if not exists automatic_tags
             (
@@ -101,6 +101,8 @@ public class DatabaseConnection
                 type      text CHECK(type IN ('I','E')) not null default 'I', -- Included/Excluded
                 directory text not null
             );
+
+            insert or ignore into tagging_rules (name) values ('Current Names');
             """);
     }
 }

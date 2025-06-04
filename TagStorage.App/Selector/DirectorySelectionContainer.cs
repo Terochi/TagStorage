@@ -3,16 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NaturalSort.Extension;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osuTK.Input;
+using TagStorage.App.DirectoryBrowser;
+using TagStorage.Library.Entities;
+using TagStorage.Library.Repository;
 
 namespace TagStorage.App.Selector;
 
 public partial class DirectorySelectionContainer : SelectionContainer<string>
 {
+    [Resolved]
+    private AutomaticTagRepository autoTags { get; set; }
+
+    [Resolved]
+    private TaggingRuleRepository tagRules { get; set; }
+
     public Bindable<string> CurrentDirectory { get; private set; } = new Bindable<string>(string.Empty);
 
     public event Action<IEnumerable<string>> AddTag;
@@ -49,6 +59,50 @@ public partial class DirectorySelectionContainer : SelectionContainer<string>
         if (e.Key == Key.A)
         {
             AddTag?.Invoke(SelectedItems.AsEnumerable());
+
+            return true;
+        }
+
+        if (e.Key == Key.D)
+        {
+            TaggingRuleEntity rule = tagRules.Get().First();
+
+            if (autoTags.Get(CurrentDirectory.Value).Any(a => a.Rule == rule.Id))
+            {
+                return true;
+            }
+
+            autoTags.Insert(new AutomaticTagEntity
+            {
+                Directory = CurrentDirectory.Value,
+                Rule = rule.Id
+            });
+
+            Drawable parent = Parent;
+
+            while (parent != null && parent is not DirectoryContainer)
+            {
+                parent = parent.Parent;
+            }
+
+            if (parent is DirectoryContainer container)
+            {
+                var curDir = new DirectoryInfo(CurrentDirectory.Value);
+                DirectoryInfo[] subDirectories = curDir.GetDirectories();
+                FileInfo[] files = curDir.GetFiles();
+
+                foreach (DirectoryInfo dir in subDirectories)
+                {
+                    container.TagFile(Path.GetFileNameWithoutExtension(dir.FullName), dir.FullName);
+                }
+
+                foreach (FileInfo file in files)
+                {
+                    container.TagFile(Path.GetFileNameWithoutExtension(file.FullName), file.FullName);
+                }
+
+                LoadDirectory(CurrentDirectory.Value);
+            }
 
             return true;
         }

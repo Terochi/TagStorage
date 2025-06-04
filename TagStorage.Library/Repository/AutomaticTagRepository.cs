@@ -14,4 +14,9 @@ public class AutomaticTagRepository(DatabaseConnection connection) : BaseReposit
             Rule = reader.GetInt32(1),
             Directory = reader.GetString(2)
         };
+
+    public IEnumerable<AutomaticTagEntity> Get(string directory)
+    {
+        return Connection.ExecuteQuery($"SELECT * FROM {TableName} WHERE directory = '{directory}';", MapEntity);
+    }
 }
