@@ -14,7 +14,7 @@ public class ChangeRepository(DatabaseConnection connection) : BaseRepository<Ch
             Location = reader.GetInt32(1),
             Date = reader.GetDateTime(2),
             Size = reader.GetInt64(3),
-            Hash = reader.GetString(4)
+            Hash = reader.IsDBNull(4) ? null : reader.GetString(4)
         };
 
     public IEnumerable<ChangeEntity> FindDuplicates(ChangeEntity entity)

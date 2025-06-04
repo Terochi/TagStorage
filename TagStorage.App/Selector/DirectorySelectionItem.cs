@@ -89,8 +89,7 @@ public partial class DirectorySelectionItem : SelectionItem<string>
             foreach (int fileId in fileLocations.GetByPath(Path.Join(CurrentDirectory.Value, Item)).Select(
                          loc => files.Get(loc.File)!.Id))
             {
-                FileTagEntity fileTag = fileTags.Get(new FileTagEntity { File = fileId, Tag = tag.Entity.Id });
-                fileTags.Delete(fileTag);
+                fileTags.Delete(new FileTagEntity { File = fileId, Tag = tag.Entity.Id });
             }
 
             LoadTags();

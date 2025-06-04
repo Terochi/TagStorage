@@ -109,7 +109,7 @@ public partial class DirectoryContainer : CompositeDrawable
     {
         string machineName = Environment.MachineName;
 
-        string hash;
+        string? hash;
         long size;
         FileLocationType type;
         DateTime lastModified;

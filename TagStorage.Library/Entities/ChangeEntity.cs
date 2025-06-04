@@ -6,5 +6,5 @@ public class ChangeEntity : IEntity
     public int Location { get; set; }
     public DateTime Date { get; set; }
     public long Size { get; set; }
-    public required string Hash { get; set; }
+    public string? Hash { get; set; }
 }

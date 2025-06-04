@@ -1,18 +1,23 @@
 ﻿using System.Globalization;
 using System.Text;
-using SHA = System.Security.Cryptography.SHA256;
+using SHA = System.Security.Cryptography.SHA1;
 
 namespace TagStorage.Library.Helper;
 
 public static class DirectoryUtils
 {
+    private const long max_file_size_to_hash = 1024 * 1024 * 256;
+    private const int max_subfolders_to_hash = 256;
+    private static int subfolderCounter;
+
     private static string shortFormatDate(DateTime dateTime) =>
         dateTime.ToUniversalTime().ToString("yyMMddHHmmss", CultureInfo.InvariantCulture);
 
-    public static (string hash, long size) CreateHash(DirectoryInfo directory)
+    public static (string? hash, long size) CreateHash(DirectoryInfo directory)
     {
         StringBuilder footprint = new StringBuilder();
         long totalSize = 0;
+        subfolderCounter = 0;
         addToFootprint(footprint, directory, ref totalSize);
         footprint.Append('=');
         footprint.Append(totalSize);
@@ -20,16 +25,22 @@ public static class DirectoryUtils
         return (hash, totalSize);
     }
 
-    public static (string hash, long size) CreateHash(FileInfo file)
+    public static (string? hash, long size) CreateHash(FileInfo file)
     {
         using FileStream fs = File.OpenRead(file.FullName);
         long totalSize = fs.Length;
+        if (totalSize > max_file_size_to_hash)
+            return (null, totalSize);
+
         string hash = Convert.ToBase64String(SHA.HashData(fs), Base64FormattingOptions.None);
         return (hash, totalSize);
     }
 
     private static void addToFootprint(StringBuilder footprint, DirectoryInfo parent, ref long totalSize, int searchedPathLength = 0, Ignore.Ignore? ignore = null)
     {
+        if (++subfolderCounter >= max_subfolders_to_hash)
+            return;
+
         IEnumerable<FileInfo> files = parent.GetFiles().AsEnumerable();
         IEnumerable<DirectoryInfo> directories = parent.GetDirectories().AsEnumerable();
 
