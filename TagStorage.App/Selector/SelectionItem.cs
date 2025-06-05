@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Platform;
 
 namespace TagStorage.App.Selector;
 
@@ -28,18 +29,18 @@ public abstract partial class SelectionItem<T> : CompositeDrawable, IStateful<Se
     }
 
     [BackgroundDependencyLoader]
-    private void load()
+    private void load(GameHost host)
     {
         AutoSizeAxes = Axes.Both;
         InternalChildren =
         [
             selection = CreateSelection().With(s => s.Alpha = 0f),
-            CreateContent(),
+            CreateContent(host),
         ];
     }
 
     protected abstract Drawable CreateSelection();
-    protected abstract Drawable CreateContent();
+    protected abstract Drawable CreateContent(GameHost host);
 
     protected override void LoadComplete()
     {

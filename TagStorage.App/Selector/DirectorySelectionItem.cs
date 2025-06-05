@@ -17,8 +17,8 @@ namespace TagStorage.App.Selector;
 
 public partial class DirectorySelectionItem : SelectionItem<string>
 {
+    public string FullName => Path.Join(CurrentDirectory.Value, Item);
     public Bindable<string> CurrentDirectory { get; set; } = new Bindable<string>();
-    protected virtual IconUsage GetIcon => FontAwesome.Solid.Folder;
 
     [Resolved]
     private GameHost host { get; set; } = null!;
@@ -48,13 +48,20 @@ public partial class DirectorySelectionItem : SelectionItem<string>
         StateChanged += updateState;
     }
 
+    protected virtual Drawable CreateIcon(GameHost host) =>
+        new SpriteIcon
+        {
+            Icon = FontAwesome.Solid.Folder,
+            Size = new Vector2(20)
+        };
+
     protected override Drawable CreateSelection() => selection = new Box
     {
         RelativeSizeAxes = Axes.Both,
         Colour = Colour4.White,
     };
 
-    protected override Drawable CreateContent()
+    protected override Drawable CreateContent(GameHost host)
     {
         var content = new FillFlowContainer
         {
@@ -64,11 +71,7 @@ public partial class DirectorySelectionItem : SelectionItem<string>
             Spacing = new Vector2(5),
             Children =
             [
-                new SpriteIcon
-                {
-                    Icon = GetIcon,
-                    Size = new Vector2(20)
-                },
+                CreateIcon(host),
                 new SpriteText
                 {
                     Width = 200,

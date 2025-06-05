@@ -52,47 +52,55 @@ public partial class DirectoryContainer : CompositeDrawable
     [BackgroundDependencyLoader]
     private void load()
     {
-        InternalChild = new FillFlowContainer
+        InternalChild = new GridContainer
         {
             RelativeSizeAxes = Axes.Both,
-            Children =
-            [
-                new Container
+            RowDimensions = [new Dimension(GridSizeMode.AutoSize), new Dimension()],
+            ColumnDimensions = [new Dimension(GridSizeMode.Relative, 1)],
+            Content = new[]
+            {
+                new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Child = search = new TagSearch()
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Child = search = new TagSearch()
+                    },
                 },
-                new Container
+                new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Children =
-                    [
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Colour4.FromHex("202020"),
-                        },
-                        new BasicScrollContainer
-                        {
-                            ClampExtension = 0,
-                            DistanceDecayScroll = 1f,
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding(20),
-                            Child = DirectorySelectionContainer = new DirectorySelectionContainer
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Children =
+                        [
+                            new Box
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Colour4.FromHex("202020"),
+                            },
+                            new BasicScrollContainer
+                            {
+                                ClampExtension = 0,
+                                DistanceDecayScroll = 1f,
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding(20),
+                                Child = DirectorySelectionContainer = new DirectorySelectionContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                }
+                            },
+                            addSearch = new TagSearchBox
+                            {
+                                Alpha = 0f,
+                                Position = new Vector2(300, 50)
                             }
-                        },
-                        addSearch = new TagSearchBox
-                        {
-                            Alpha = 0f,
-                            Position = new Vector2(300, 50)
-                        }
-                    ]
+                        ]
+                    }
                 }
-            ]
+            }
         };
 
         DirectorySelectionContainer.AddTag += tags =>

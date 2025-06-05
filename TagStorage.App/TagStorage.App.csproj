@@ -10,5 +10,6 @@
     <ItemGroup>
         <PackageReference Include="NaturalSort.Extension" Version="4.3.0" />
         <PackageReference Include="ppy.osu.Framework" Version="2025.512.0"/>
+        <PackageReference Include="System.Drawing.Common" Version="9.0.5" />
     </ItemGroup>
 </Project>
