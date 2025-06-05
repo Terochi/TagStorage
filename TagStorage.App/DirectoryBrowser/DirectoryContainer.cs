@@ -38,7 +38,8 @@ public partial class DirectoryContainer : CompositeDrawable
     public override bool RequestsFocus => true;
     public override bool AcceptsFocus => true;
 
-    private TagSearchBox search;
+    private TagSearchBox addSearch;
+    private TagSearch search;
 
     public DirectoryContainer()
     {
@@ -51,44 +52,88 @@ public partial class DirectoryContainer : CompositeDrawable
     [BackgroundDependencyLoader]
     private void load()
     {
-        InternalChildren =
-        [
-            new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-                Colour = Colour4.FromHex("202020"),
-            },
-            new BasicScrollContainer
-            {
-                ClampExtension = 0,
-                DistanceDecayScroll = 1f,
-                RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding(20),
-                Child = DirectorySelectionContainer = new DirectorySelectionContainer
+        InternalChild = new FillFlowContainer
+        {
+            RelativeSizeAxes = Axes.Both,
+            Children =
+            [
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Child = search = new TagSearch()
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children =
+                    [
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Colour4.FromHex("202020"),
+                        },
+                        new BasicScrollContainer
+                        {
+                            ClampExtension = 0,
+                            DistanceDecayScroll = 1f,
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding(20),
+                            Child = DirectorySelectionContainer = new DirectorySelectionContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                            }
+                        },
+                        addSearch = new TagSearchBox
+                        {
+                            Alpha = 0f,
+                            Position = new Vector2(300, 50)
+                        }
+                    ]
                 }
-            },
-            search = new TagSearchBox
-            {
-                Alpha = 0f,
-                Position = new Vector2(300, 50)
-            }
-        ];
+            ]
+        };
 
         DirectorySelectionContainer.AddTag += tags =>
         {
             if (DirectorySelectionContainer.SelectedBlueprints.Count == 0) return;
 
-            search.Show();
+            addSearch.Show();
         };
 
-        search.OnCommit += onCommit;
+        addSearch.OnCommit += onCommit;
 
         DirectorySelectionContainer.SelectedItems.BindCollectionChanged((_, _) =>
         {
-            search.Hide();
+            addSearch.Hide();
+        });
+
+        search.SelectedTags.BindCollectionChanged((_, e) =>
+        {
+            if (search.SelectedTags.Count == 0)
+            {
+                DirectorySelectionContainer.LoadDirectory(DirectorySelectionContainer.CurrentDirectory.Value);
+                return;
+            }
+
+            IEnumerable<int> selectedTagIds = search.SelectedTags.Select(t => t.Id);
+            IEnumerable<int> taggedFileIds =
+                search.SelectedTags.SelectMany(tag => fileTags.GetByTag(tag.Id))
+                      .GroupBy(file => file.File)
+                      .Where(g => selectedTagIds.All(tag => g.Any(f => f.Tag == tag)))
+                      .Select(g => g.Key);
+
+            IEnumerable<FileSystemInfo> fileInfos = taggedFileIds.Select(fileLocations.Get).Where(loc => loc != null).Select(loc =>
+            {
+                return loc!.Type switch
+                {
+                    FileLocationType.F => (FileSystemInfo)new FileInfo(loc.Path),
+                    FileLocationType.D => new DirectoryInfo(loc.Path),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+            });
+            DirectorySelectionContainer.LoadDirectory(fileInfos);
         });
     }
 
@@ -207,9 +252,9 @@ public partial class DirectoryContainer : CompositeDrawable
             tag = tags.Insert(new TagEntity { Color = newColor.ToHex(), Name = sender.Text });
         }
 
-        foreach (string name in DirectorySelectionContainer.SelectedItems)
+        foreach ((string name, DirectorySelectionItem item) in DirectorySelectionContainer.SelectedItems.Zip(DirectorySelectionContainer.SelectedBlueprints.Cast<DirectorySelectionItem>()))
         {
-            string fullName = Path.Join(DirectorySelectionContainer.CurrentDirectory.Value, name);
+            string fullName = Path.Join(item.CurrentDirectory.Value, name);
             TagFile(tag, fullName);
         }
 
@@ -218,12 +263,12 @@ public partial class DirectoryContainer : CompositeDrawable
             selectedBlueprint.LoadTags();
         }
 
-        search.Hide();
+        addSearch.Hide();
     }
 
     protected override bool OnClick(ClickEvent e)
     {
-        search.Hide();
+        addSearch.Hide();
 
         return base.OnClick(e);
     }

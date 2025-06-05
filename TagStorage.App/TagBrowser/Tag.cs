@@ -13,6 +13,15 @@ public partial class Tag(TagEntity tag) : CompositeDrawable
 {
     public readonly TagEntity Entity = tag;
 
+    private Box box;
+
+    private Colour4 calculateBorderColour(Colour4 color)
+    {
+        Colour4 borderColor = color.Lighten(0.2f);
+        if (borderColor == color) borderColor = color.Darken(0.2f);
+        return borderColor;
+    }
+
     [BackgroundDependencyLoader]
     private void load()
     {
@@ -20,13 +29,11 @@ public partial class Tag(TagEntity tag) : CompositeDrawable
         Masking = true;
         CornerRadius = 10;
         BorderThickness = 3.5f;
-        Colour4 borderColor = color.Lighten(0.2f);
-        if (borderColor == color) borderColor = color.Darken(0.2f);
-        BorderColour = borderColor;
+        BorderColour = calculateBorderColour(color);
         AutoSizeAxes = Axes.Both;
         InternalChildren =
         [
-            new Box
+            box = new Box
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = color,

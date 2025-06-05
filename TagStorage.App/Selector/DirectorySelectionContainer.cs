@@ -35,6 +35,23 @@ public partial class DirectorySelectionContainer : SelectionContainer<string>
 
     protected override SelectionItem<string> CreateItem(string item)
     {
+        var directoryInfo = new DirectoryInfo(item);
+        var fileInfo = new FileInfo(item);
+
+        if (directoryInfo.Exists && !directoryInfo.FullName.EndsWith(":\\"))
+        {
+            var selectionItem = new DirectorySelectionItem(directoryInfo.Name);
+            selectionItem.CurrentDirectory.Value = directoryInfo.Parent!.FullName;
+            return selectionItem;
+        }
+
+        if (fileInfo.Exists)
+        {
+            var selectionItem = new FileSelectionItem(directoryInfo.Name);
+            selectionItem.CurrentDirectory.Value = fileInfo.DirectoryName;
+            return selectionItem;
+        }
+
         if (Directory.Exists(Path.Join(CurrentDirectory.Value, item)))
             return new DirectorySelectionItem(item) { CurrentDirectory = CurrentDirectory.GetBoundCopy() };
 
@@ -45,9 +62,9 @@ public partial class DirectorySelectionContainer : SelectionContainer<string>
     {
         var blueprint = SelectedBlueprints.FirstOrDefault(i => i.IsHovered);
 
-        if (blueprint is DirectorySelectionItem and not FileSelectionItem)
+        if (blueprint is DirectorySelectionItem directoryItem and not FileSelectionItem)
         {
-            LoadDirectory(Path.Join(CurrentDirectory.Value, blueprint.Item));
+            LoadDirectory(Path.Join(directoryItem.CurrentDirectory.Value, directoryItem.Item));
             return true;
         }
 
@@ -108,6 +125,16 @@ public partial class DirectorySelectionContainer : SelectionContainer<string>
         }
 
         return base.OnKeyDown(e);
+    }
+
+    public void LoadDirectory(IEnumerable<FileSystemInfo> files)
+    {
+        ClearAll();
+
+        foreach (FileSystemInfo file in files.OrderBy(f => Path.GetFileNameWithoutExtension(f.FullName), new NaturalSortComparer(StringComparer.OrdinalIgnoreCase)))
+        {
+            AddBlueprintFor(file.FullName);
+        }
     }
 
     public void LoadDirectory(string path)
