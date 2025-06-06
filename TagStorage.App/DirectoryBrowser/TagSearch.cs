@@ -8,14 +8,14 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using TagStorage.App.TagBrowser;
 using TagStorage.Library.Entities;
-using TagStorage.Library.Repository;
+using TagStorage.Library.Facades;
 
 namespace TagStorage.App.DirectoryBrowser;
 
 public partial class TagSearch : CompositeDrawable
 {
     [Resolved]
-    private TagRepository tags { get; set; }
+    private TagFacade tags { get; set; }
 
     private TagList taglist;
     private TagList selectedlist;

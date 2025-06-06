@@ -1,19 +1,16 @@
 ﻿using System.Data;
+using osu.Framework.Allocation;
 using TagStorage.Library.Entities;
 
-namespace TagStorage.Library.Repository;
+namespace TagStorage.Library.Repositories;
 
-public abstract class BaseRepository<TEntity>
+public abstract partial class BaseRepository<TEntity> : IDependencyInjectionCandidate
     where TEntity : class, IEntity
 {
     protected abstract string TableName { get; }
 
-    protected readonly DatabaseConnection Connection;
-
-    protected BaseRepository(DatabaseConnection connection)
-    {
-        Connection = connection;
-    }
+    [Resolved]
+    protected DatabaseConnection Connection { get; private set; }
 
     protected abstract TEntity MapEntity(IDataReader reader);
 

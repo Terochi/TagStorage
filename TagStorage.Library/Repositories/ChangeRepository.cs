@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using TagStorage.Library.Entities;
 
-namespace TagStorage.Library.Repository;
+namespace TagStorage.Library.Repositories;
 
-public class ChangeRepository(DatabaseConnection connection) : BaseRepository<ChangeEntity>(connection)
+public partial class ChangeRepository : BaseRepository<ChangeEntity>
 {
     protected override string TableName => "changes";
 

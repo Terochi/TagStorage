@@ -11,7 +11,7 @@ using osu.Framework.Platform;
 using osuTK;
 using TagStorage.App.TagBrowser;
 using TagStorage.Library.Entities;
-using TagStorage.Library.Repository;
+using TagStorage.Library.Repositories;
 
 namespace TagStorage.App.Selector;
 

@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using TagStorage.Library.Entities;
 
-namespace TagStorage.Library.Repository;
+namespace TagStorage.Library.Repositories;
 
-public class AutomaticTagRepository(DatabaseConnection connection) : BaseRepository<AutomaticTagEntity>(connection)
+public partial class AutomaticTagRepository : BaseRepository<AutomaticTagEntity>
 {
     protected override string TableName => "automatic_tags";
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using TagStorage.Library.Entities;
-using TagStorage.Library.Repository;
+using TagStorage.Library.Repositories;
 
 namespace TagStorage.App.TagBrowser;
 

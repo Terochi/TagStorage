@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using TagStorage.Library.Entities;
 
-namespace TagStorage.Library.Repository;
+namespace TagStorage.Library.Repositories;
 
-public class FileLocationRepository(DatabaseConnection connection) : BaseRepository<FileLocationEntity>(connection)
+public partial class FileLocationRepository : BaseRepository<FileLocationEntity>
 {
     protected override string TableName => "file_locations";
 

@@ -9,31 +9,17 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osuTK;
 using TagStorage.App.Selector;
 using TagStorage.Library.Entities;
-using TagStorage.Library.Helper;
-using TagStorage.Library.Repository;
+using TagStorage.Library.Facades;
 
 namespace TagStorage.App.DirectoryBrowser;
 
 public partial class DirectoryContainer : CompositeDrawable
 {
     [Resolved]
-    private TagRepository tags { get; set; }
-
-    [Resolved]
-    private ChangeRepository changes { get; set; }
-
-    [Resolved]
-    private FileRepository files { get; set; }
-
-    [Resolved]
-    private FileLocationRepository fileLocations { get; set; }
-
-    [Resolved]
-    private FileTagRepository fileTags { get; set; }
+    private TagFacade tags { get; set; }
 
     public override bool RequestsFocus => true;
     public override bool AcceptsFocus => true;
@@ -125,14 +111,7 @@ public partial class DirectoryContainer : CompositeDrawable
                 return;
             }
 
-            IEnumerable<int> selectedTagIds = search.SelectedTags.Select(t => t.Id);
-            IEnumerable<int> taggedFileIds =
-                search.SelectedTags.SelectMany(tag => fileTags.GetByTag(tag.Id))
-                      .GroupBy(file => file.File)
-                      .Where(g => selectedTagIds.All(tag => g.Any(f => f.Tag == tag)))
-                      .Select(g => g.Key);
-
-            IEnumerable<FileSystemInfo> fileInfos = taggedFileIds.Select(fileLocations.Get).Where(loc => loc != null).Select(loc =>
+            IEnumerable<FileSystemInfo> fileInfos = tags.GetFileSelectedTags(search.SelectedTags).Select(loc =>
             {
                 return loc!.Type switch
                 {
@@ -145,125 +124,15 @@ public partial class DirectoryContainer : CompositeDrawable
         });
     }
 
-    public void TagFile(string tagName, string fullname)
-    {
-        TagEntity? tag = tags.Get(tagName).FirstOrDefault();
-
-        if (tag == null)
-        {
-            Colour4 newColor = Colour4.FromHSL(Random.Shared.NextSingle(), Random.Shared.NextSingle() * 0.56f + 0.42f, Random.Shared.NextSingle() * 0.5f + 0.4f);
-            tag = tags.Insert(new TagEntity { Color = newColor.ToHex(), Name = tagName });
-        }
-
-        TagFile(tag, fullname);
-    }
-
-    public void TagFile(TagEntity tag, string fullname)
-    {
-        string machineName = Environment.MachineName;
-
-        string? hash;
-        long size;
-        FileLocationType type;
-        DateTime lastModified;
-
-        if (Directory.Exists(fullname))
-        {
-            var directoryInfo = new DirectoryInfo(fullname);
-            lastModified = DateTime.UtcNow;
-            (hash, size) = DirectoryUtils.CreateHash(directoryInfo);
-            type = FileLocationType.D;
-        }
-        else
-        {
-            var fileInfo = new FileInfo(fullname);
-            lastModified = fileInfo.LastWriteTimeUtc;
-            (hash, size) = DirectoryUtils.CreateHash(fileInfo);
-            type = FileLocationType.F;
-        }
-
-        FileEntity file;
-        FileLocationEntity? location = fileLocations.GetByPath(fullname).FirstOrDefault(l => l.Machine == machineName);
-
-        if (location == null)
-        {
-            file = files.Insert(new FileEntity());
-            location = fileLocations.Insert(new FileLocationEntity
-            {
-                File = file.Id,
-                Machine = machineName,
-                Path = fullname,
-                Type = type,
-            });
-        }
-        else if (location.Type != type)
-        {
-            Logger.Log($"File type does not match with existing {location.Path}", level: LogLevel.Error);
-            return;
-        }
-        else
-        {
-            file = files.Get(location.File)!;
-        }
-
-        IEnumerable<ChangeEntity> foundChanges = changes.FindDuplicates(new ChangeEntity
-        {
-            Hash = hash,
-            Size = size
-        });
-
-        bool foundIdentical = false;
-
-        if (foundChanges.Any())
-        {
-            Logger.Log($"Found duplicate changes for {location.Path}");
-
-            foreach (ChangeEntity change in foundChanges)
-            {
-                FileLocationEntity loc = fileLocations.Get(change.Location)!;
-                Logger.Log($"Duplicate file: {loc.Path}");
-                foundIdentical |= change.Location == location.Id;
-            }
-            // TODO: More handling for matching with already existing FileEntity...
-        }
-
-        if (!foundIdentical)
-        {
-            changes.Insert(new ChangeEntity
-            {
-                Hash = hash,
-                Size = size,
-                Date = lastModified,
-                Location = location.Id,
-            });
-        }
-
-        FileTagEntity fileTag = new FileTagEntity
-        {
-            File = file.Id,
-            Tag = tag.Id
-        };
-
-        if (!fileTags.Exists(fileTag))
-        {
-            fileTags.Insert(fileTag);
-        }
-    }
-
     private void onCommit(TextBox sender, bool newText)
     {
-        TagEntity? tag = tags.Get(sender.Text).FirstOrDefault();
-
-        if (tag == null)
-        {
-            Colour4 newColor = Colour4.FromHSL(Random.Shared.NextSingle(), Random.Shared.NextSingle() * 0.56f + 0.42f, Random.Shared.NextSingle() * 0.5f + 0.4f);
-            tag = tags.Insert(new TagEntity { Color = newColor.ToHex(), Name = sender.Text });
-        }
+        TagEntity tag = tags.Get(sender.Text).FirstOrDefault() ??
+                        tags.Insert(sender.Text);
 
         foreach ((string name, DirectorySelectionItem item) in DirectorySelectionContainer.SelectedItems.Zip(DirectorySelectionContainer.SelectedBlueprints.Cast<DirectorySelectionItem>()))
         {
             string fullName = Path.Join(item.CurrentDirectory.Value, name);
-            TagFile(tag, fullName);
+            tags.TagFile(tag, fullName);
         }
 
         foreach (DirectorySelectionItem selectedBlueprint in DirectorySelectionContainer.SelectedBlueprints.Cast<DirectorySelectionItem>())

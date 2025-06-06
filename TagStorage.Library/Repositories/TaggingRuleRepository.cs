@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using TagStorage.Library.Entities;
 
-namespace TagStorage.Library.Repository;
+namespace TagStorage.Library.Repositories;
 
-public class TaggingRuleRepository(DatabaseConnection connection) : BaseRepository<TaggingRuleEntity>(connection)
+public partial class TaggingRuleRepository : BaseRepository<TaggingRuleEntity>
 {
     protected override string TableName => "tagging_rules";
 

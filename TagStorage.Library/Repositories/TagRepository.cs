@@ -1,10 +1,9 @@
 ﻿using System.Data;
 using TagStorage.Library.Entities;
-using TagStorage.Library.Helper;
 
-namespace TagStorage.Library.Repository;
+namespace TagStorage.Library.Repositories;
 
-public class TagRepository(DatabaseConnection connection) : BaseRepository<TagEntity>(connection)
+public partial class TagRepository : BaseRepository<TagEntity>
 {
     protected override string TableName => "tags";
 
@@ -15,11 +14,6 @@ public class TagRepository(DatabaseConnection connection) : BaseRepository<TagEn
             Name = reader.GetString(1),
             Color = reader.IsDBNull(2) ? null : reader.GetString(2),
         };
-
-    public IEnumerable<TagEntity> Get(string name)
-    {
-        return Get().Where(t => t.Name.FuzzyMatch(name));
-    }
 
     public IEnumerable<TagEntity> GetNestedChildTags(int id)
     {

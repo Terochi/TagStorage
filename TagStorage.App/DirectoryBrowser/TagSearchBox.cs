@@ -5,14 +5,14 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osuTK;
 using TagStorage.App.TagBrowser;
-using TagStorage.Library.Repository;
+using TagStorage.Library.Facades;
 
 namespace TagStorage.App.DirectoryBrowser;
 
 public partial class TagSearchBox : CompositeDrawable
 {
     [Resolved]
-    private TagRepository tags { get; set; }
+    private TagFacade tags { get; set; }
 
     private TagList taglist;
     private BasicTextBox textbox;

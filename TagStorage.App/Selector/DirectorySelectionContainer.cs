@@ -11,17 +11,17 @@ using osu.Framework.Input.Events;
 using osuTK.Input;
 using TagStorage.App.DirectoryBrowser;
 using TagStorage.Library.Entities;
-using TagStorage.Library.Repository;
+using TagStorage.Library.Facades;
 
 namespace TagStorage.App.Selector;
 
 public partial class DirectorySelectionContainer : SelectionContainer<string>
 {
     [Resolved]
-    private AutomaticTagRepository autoTags { get; set; }
+    private TagFacade tags { get; set; }
 
     [Resolved]
-    private TaggingRuleRepository tagRules { get; set; }
+    private AutoTagFacade autoTags { get; set; }
 
     public Bindable<string> CurrentDirectory { get; private set; } = new Bindable<string>(string.Empty);
 
@@ -82,7 +82,7 @@ public partial class DirectorySelectionContainer : SelectionContainer<string>
 
         if (e.Key == Key.D)
         {
-            TaggingRuleEntity rule = tagRules.Get().First();
+            TaggingRuleEntity rule = autoTags.GetTagRules().First();
 
             if (autoTags.Get(CurrentDirectory.Value).Any(a => a.Rule == rule.Id))
             {
@@ -110,12 +110,12 @@ public partial class DirectorySelectionContainer : SelectionContainer<string>
 
                 foreach (DirectoryInfo dir in subDirectories)
                 {
-                    container.TagFile(Path.GetFileNameWithoutExtension(dir.FullName), dir.FullName);
+                    tags.TagFile(Path.GetFileNameWithoutExtension(dir.FullName), dir.FullName);
                 }
 
                 foreach (FileInfo file in files)
                 {
-                    container.TagFile(Path.GetFileNameWithoutExtension(file.FullName), file.FullName);
+                    tags.TagFile(Path.GetFileNameWithoutExtension(file.FullName), file.FullName);
                 }
 
                 LoadDirectory(CurrentDirectory.Value);

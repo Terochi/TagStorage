@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using TagStorage.Library.Entities;
 
-namespace TagStorage.Library.Repository;
+namespace TagStorage.Library.Repositories;
 
-public class DirectoryRepository(DatabaseConnection connection) : BaseRepository<DirectoryEntity>(connection)
+public partial class DirectoryRepository : BaseRepository<DirectoryEntity>
 {
     protected override string TableName => "directories";
 

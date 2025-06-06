@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using TagStorage.Library.Entities;
 
-namespace TagStorage.Library.Repository;
+namespace TagStorage.Library.Repositories;
 
-public class TagChildRepository(DatabaseConnection connection) : BaseRepository<TagChildEntity>(connection)
+public partial class TagChildRepository : BaseRepository<TagChildEntity>
 {
     protected override string TableName => "tag_children";
 

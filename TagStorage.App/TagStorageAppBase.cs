@@ -1,10 +1,13 @@
+using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
 using osuTK;
 using TagStorage.Library;
-using TagStorage.Library.Repository;
+using TagStorage.Library.Facades;
+using TagStorage.Library.Repositories;
 using TagStorage.Resources;
 
 namespace TagStorage.App
@@ -36,17 +39,21 @@ namespace TagStorage.App
 
             string dbPath = Host.Storage.GetFullPath("tagStorage.db", true);
 
-            var db = new DatabaseConnection(dbPath);
-            dependencies.CacheAs(db);
-            dependencies.CacheAs(new TagRepository(db));
-            dependencies.CacheAs(new ChangeRepository(db));
-            dependencies.CacheAs(new DirectoryRepository(db));
-            dependencies.CacheAs(new FileRepository(db));
-            dependencies.CacheAs(new FileLocationRepository(db));
-            dependencies.CacheAs(new FileTagRepository(db));
-            dependencies.CacheAs(new TaggingRuleRepository(db));
-            dependencies.CacheAs(new TagChildRepository(db));
-            dependencies.CacheAs(new AutomaticTagRepository(db));
+            dependencies.CacheAs(new DatabaseConnection(dbPath));
+
+            foreach (Type repositoryType in typeof(BaseRepository<>).Assembly.GetTypes().Where(t => t.BaseType?.Name == typeof(BaseRepository<>).Name))
+            {
+                var repository = (IDependencyInjectionCandidate)Activator.CreateInstance(repositoryType);
+                dependencies.Inject(repository);
+                dependencies.Cache(repository);
+            }
+
+            foreach (Type facadeType in typeof(IFacadeBase).Assembly.GetTypes().Where(t => t.IsAssignableTo(typeof(IFacadeBase)) && !t.IsInterface))
+            {
+                var facade = (IDependencyInjectionCandidate)Activator.CreateInstance(facadeType);
+                dependencies.Inject(facade);
+                dependencies.Cache(facade);
+            }
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>

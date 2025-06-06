@@ -1,27 +1,10 @@
 ﻿using TagStorage.Library;
-using TagStorage.Library.Entities;
 using TagStorage.Library.Helper;
-using TagStorage.Library.Repository;
 
 namespace TagStorage.Terminal;
 
 public static class Program
 {
-    public static TagEntity? SelectTag(TagRepository repository, string prompt = "Enter tag: ")
-    {
-        var interactiveInput = new InteractiveInput<TagEntity>(
-            repository.Get,
-            printTransform,
-            prompt);
-
-        return interactiveInput.ReadInput();
-    }
-
-    private static string printTransform(TagEntity t)
-    {
-        return t.Name;
-    }
-
     public static void PrintGraphViz(DatabaseConnection db)
     {
         Console.WriteLine("digraph G {");
@@ -64,122 +47,6 @@ public static class Program
         {
             var footprint = DirectoryUtils.CreateHash(new DirectoryInfo(dir));
             Console.WriteLine(footprint);
-        }
-
-        return;
-        var db = new DatabaseConnection("tagStorage.db");
-        var tagRepository = new TagRepository(db);
-        var tagChildRepository = new TagChildRepository(db);
-
-        while (true)
-        {
-            Console.WriteLine("'A' to add a tag");
-            Console.WriteLine("'F' to find a tag");
-            Console.WriteLine("'L' to link two tags");
-            Console.WriteLine("'P' to print diagraph");
-            Console.WriteLine("'C' to print child tags of a tag");
-            Console.WriteLine("'N' to print nested tags of a tag");
-            Console.WriteLine("'Q' to quit.");
-
-            ConsoleKeyInfo key = Console.ReadKey(true);
-
-            if (key.Key == ConsoleKey.Q)
-            {
-                break;
-            }
-
-            if (key.Key == ConsoleKey.A)
-            {
-                Console.Write("Enter tag name: ");
-                string tagName = Console.ReadLine() ?? string.Empty;
-
-                if (string.IsNullOrEmpty(tagName))
-                {
-                    continue;
-                }
-
-                TagEntity child = tagRepository.Insert(new TagEntity { Name = tagName });
-                Console.WriteLine($"Tag '{child.Name}' added.");
-
-                TagEntity? parent = SelectTag(tagRepository, "Select parent tag: ");
-
-                if (parent != null)
-                {
-                    tagChildRepository.Insert(new TagChildEntity { Child = child.Id, Parent = parent.Id });
-                    Console.WriteLine($"Tag '{child.Name}' added as a child of '{parent.Name}'.");
-                }
-                else
-                {
-                    Console.WriteLine("No parent tag selected.");
-                }
-            }
-
-            if (key.Key == ConsoleKey.L)
-            {
-                TagEntity? child = SelectTag(tagRepository, "Select child tag: ");
-                TagEntity? parent = SelectTag(tagRepository, "Select parent tag: ");
-
-                if (parent != null && child != null)
-                {
-                    tagChildRepository.Insert(new TagChildEntity { Child = child.Id, Parent = parent.Id });
-                    Console.WriteLine($"Tag '{child.Name}' added as a child of '{parent.Name}'.");
-                }
-                else
-                {
-                    Console.WriteLine("Empty tag selected.");
-                }
-            }
-
-            if (key.Key == ConsoleKey.F)
-            {
-                TagEntity? tag = SelectTag(tagRepository);
-
-                Console.WriteLine(tag == null ? "No tag found." : $"Found tag: {tag.Name}");
-            }
-
-            if (key.Key == ConsoleKey.C)
-            {
-                TagEntity? parent = SelectTag(tagRepository, "Select parent tag: ");
-
-                if (parent != null)
-                {
-                    Console.WriteLine($"Child tags of '{parent.Name}':");
-
-                    foreach (TagEntity child in tagRepository.GetChildTags(parent.Id))
-                    {
-                        Console.WriteLine($"- {child.Name}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("No tag selected.");
-                }
-            }
-
-            if (key.Key == ConsoleKey.N)
-            {
-                TagEntity? parent = SelectTag(tagRepository, "Select parent tag: ");
-
-                if (parent != null)
-                {
-                    Console.WriteLine($"Child tags of '{parent.Name}':");
-
-                    foreach (TagEntity child in tagRepository.GetNestedChildTags(parent.Id))
-                    {
-                        Console.WriteLine($"- {child.Name}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("No tag selected.");
-                }
-            }
-
-            if (key.Key == ConsoleKey.P)
-            {
-                Console.Clear();
-                PrintGraphViz(db);
-            }
         }
     }
 }
