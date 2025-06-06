@@ -7,7 +7,7 @@ using osu.Framework.IO.Stores;
 using osuTK;
 using TagStorage.Library;
 using TagStorage.Library.Facades;
-using TagStorage.Library.Repositories;
+using TagStorage.Library.Installers;
 using TagStorage.Resources;
 
 namespace TagStorage.App
@@ -40,13 +40,8 @@ namespace TagStorage.App
             string dbPath = Host.Storage.GetFullPath("tagStorage.db", true);
 
             dependencies.CacheAs(new DatabaseConnection(dbPath));
-
-            foreach (Type repositoryType in typeof(BaseRepository<>).Assembly.GetTypes().Where(t => t.BaseType?.Name == typeof(BaseRepository<>).Name))
-            {
-                var repository = (IDependencyInjectionCandidate)Activator.CreateInstance(repositoryType);
-                dependencies.Inject(repository);
-                dependencies.Cache(repository);
-            }
+            RepositoryInstaller.Install(dependencies);
+            FacadeInstaller.Install(dependencies);
 
             foreach (Type facadeType in typeof(IFacadeBase).Assembly.GetTypes().Where(t => t.IsAssignableTo(typeof(IFacadeBase)) && !t.IsInterface))
             {

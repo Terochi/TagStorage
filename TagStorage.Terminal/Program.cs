@@ -1,5 +1,8 @@
-﻿using TagStorage.Library;
+﻿using osu.Framework.Allocation;
+using TagStorage.Library;
+using TagStorage.Library.Facades;
 using TagStorage.Library.Helper;
+using TagStorage.Library.Installers;
 
 namespace TagStorage.Terminal;
 
@@ -48,5 +51,15 @@ public static class Program
             var footprint = DirectoryUtils.CreateHash(new DirectoryInfo(dir));
             Console.WriteLine(footprint);
         }
+
+        DatabaseConnection db = new DatabaseConnection("tagStorage.db");
+
+        var dependencies = new DependencyContainer();
+        dependencies.CacheAs(db);
+        RepositoryInstaller.Install(dependencies);
+        FacadeInstaller.Install(dependencies);
+
+        TagFacade tags = dependencies.Get<TagFacade>();
+        AutoTagFacade autoTags = dependencies.Get<AutoTagFacade>();
     }
 }
