@@ -50,7 +50,15 @@ public static class DirectoryUtils
         {
             ignore = new Ignore.Ignore();
             searchedPathLength = parent.FullName.Length + 1;
-            ignore.Add(File.ReadLines(gitignore.FullName));
+
+            foreach (string rule in File.ReadLines(gitignore.FullName))
+            {
+                try
+                {
+                    ignore.Add(rule);
+                }
+                catch { }
+            }
 
             footprint.Append(shortFormatDate(gitignore.LastWriteTime));
         }
