@@ -145,7 +145,7 @@ public partial class DirectorySelectionContainer : SelectionContainer<string>
     {
         ClearAll();
 
-        foreach (FileSystemInfo file in files.OrderBy(f => Path.GetFileNameWithoutExtension(f.FullName), new NaturalSortComparer(StringComparer.OrdinalIgnoreCase)))
+        foreach (FileSystemInfo file in files.OrderBy(f => Path.GetFileNameWithoutExtension(f.FullName), new NaturalSortComparer(StringComparison.OrdinalIgnoreCase)))
         {
             AddBlueprintFor(file.FullName);
         }
@@ -171,14 +171,14 @@ public partial class DirectorySelectionContainer : SelectionContainer<string>
             files = Directory.GetFiles(path);
         }
 
-        foreach (string directory in directories.OrderBy(Path.GetFileNameWithoutExtension, new NaturalSortComparer(StringComparer.OrdinalIgnoreCase)))
+        foreach (string directory in directories.OrderBy(Path.GetFileNameWithoutExtension, new NaturalSortComparer(StringComparison.OrdinalIgnoreCase)))
         {
             string name = Path.GetFileName(directory);
             if (string.IsNullOrWhiteSpace(name)) name = directory;
             AddBlueprintFor(name);
         }
 
-        foreach (string file in files.OrderBy(Path.GetFileNameWithoutExtension, new NaturalSortComparer(StringComparer.OrdinalIgnoreCase)))
+        foreach (string file in files.OrderBy(Path.GetFileNameWithoutExtension, new NaturalSortComparer(StringComparison.OrdinalIgnoreCase)))
         {
             string name = Path.GetFileName(file);
             AddBlueprintFor(name);
