@@ -1,12 +1,9 @@
-using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
 using osuTK;
 using TagStorage.Library;
-using TagStorage.Library.Facades;
 using TagStorage.Library.Installers;
 using TagStorage.Resources;
 
@@ -42,13 +39,6 @@ namespace TagStorage.App
             dependencies.CacheAs(new DatabaseConnection(dbPath));
             RepositoryInstaller.Install(dependencies);
             FacadeInstaller.Install(dependencies);
-
-            foreach (Type facadeType in typeof(IFacadeBase).Assembly.GetTypes().Where(t => t.IsAssignableTo(typeof(IFacadeBase)) && !t.IsInterface))
-            {
-                var facade = (IDependencyInjectionCandidate)Activator.CreateInstance(facadeType);
-                dependencies.Inject(facade);
-                dependencies.Cache(facade);
-            }
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
