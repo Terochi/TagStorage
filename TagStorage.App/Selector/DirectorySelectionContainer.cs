@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NaturalSort.Extension;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -71,6 +72,8 @@ public partial class DirectorySelectionContainer : SelectionContainer<string>
         return base.OnDoubleClick(e);
     }
 
+    private readonly Regex wordSplitRegex = new Regex(@"(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|(?<=[A-Za-z])(?=\d)|[& \t\-_]+|(?<=\d)(?=[A-Za-z])", RegexOptions.Compiled);
+
     protected override bool OnKeyDown(KeyDownEvent e)
     {
         if (e.Key == Key.A)
@@ -110,15 +113,26 @@ public partial class DirectorySelectionContainer : SelectionContainer<string>
 
                 foreach (DirectoryInfo dir in subDirectories)
                 {
-                    tags.TagFile(Path.GetFileNameWithoutExtension(dir.FullName), dir.FullName);
+                    foreach (string name in names(Path.GetFileNameWithoutExtension(dir.FullName)))
+                    {
+                        tags.TagFile(name.ToLowerInvariant(), dir.FullName);
+                    }
                 }
 
                 foreach (FileInfo file in files)
                 {
-                    tags.TagFile(Path.GetFileNameWithoutExtension(file.FullName), file.FullName);
+                    foreach (string name in names(Path.GetFileNameWithoutExtension(file.FullName)))
+                    {
+                        tags.TagFile(name.ToLowerInvariant(), file.FullName);
+                    }
                 }
 
                 LoadDirectory(CurrentDirectory.Value);
+
+                IEnumerable<string> names(string name)
+                {
+                    return wordSplitRegex.Split(name);
+                }
             }
 
             return true;

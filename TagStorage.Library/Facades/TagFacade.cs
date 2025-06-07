@@ -34,6 +34,11 @@ public partial class TagFacade : IFacadeBase
         return Get().Where(t => t.Name.FuzzyMatch(name));
     }
 
+    public IEnumerable<TagEntity> GetExact(string name)
+    {
+        return Get().Where(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+    }
+
     public TagEntity Insert(string tagName)
     {
         Colour4 newColor = Colour4.FromHSL(Random.Shared.NextSingle(), Random.Shared.NextSingle() * 0.56f + 0.42f, Random.Shared.NextSingle() * 0.35f + 0.4f);
@@ -59,7 +64,7 @@ public partial class TagFacade : IFacadeBase
 
     public void TagFile(string tagName, string fullname)
     {
-        TagEntity tag = Get(tagName).FirstOrDefault() ?? Insert(tagName);
+        TagEntity tag = GetExact(tagName).FirstOrDefault() ?? Insert(tagName);
 
         TagFile(tag, fullname);
     }
