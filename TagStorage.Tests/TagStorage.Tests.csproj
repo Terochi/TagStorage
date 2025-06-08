@@ -28,6 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\TagStorage.DAL\TagStorage.DAL.csproj" />
       <ProjectReference Include="..\TagStorage.Library\TagStorage.Library.csproj" />
     </ItemGroup>
 
