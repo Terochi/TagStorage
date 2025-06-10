@@ -12,7 +12,7 @@ public class TagEntity : EntityWithId
     public ICollection<TagChildEntity> Children { get; }
     public ICollection<FileTagEntity> FileTags { get; }
 
-    public static void OnModelCreating(ModelBuilder modelBuilder)
+    public new static void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TagEntity>()
                     .HasMany(t => t.Parents)

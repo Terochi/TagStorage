@@ -6,7 +6,5 @@ public class FileTagEntityMapper : IEntityMapper<FileTagEntity>
 {
     public void MapToExistingEntity(FileTagEntity existingEntity, FileTagEntity newEntity)
     {
-        existingEntity.TagId = newEntity.TagId;
-        existingEntity.FileId = newEntity.FileId;
     }
 }

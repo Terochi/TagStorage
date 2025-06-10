@@ -5,15 +5,14 @@ namespace TagStorage.DAL.Entities;
 
 public class ChangeEntity : EntityWithId
 {
-    public int Location { get; set; }
     public DateTime Date { get; set; }
     public long Size { get; set; }
     public string? Hash { get; set; }
 
     public Guid FileLocationId { get; set; }
-    public FileLocationEntity FileLocation { get; }
+    public FileLocationEntity FileLocation { get; set; }
 
-    public static void OnModelCreating(ModelBuilder modelBuilder)
+    public new static void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ChangeEntity>()
                     .HasKey(c => c.Id);

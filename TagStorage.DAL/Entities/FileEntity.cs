@@ -8,7 +8,7 @@ public class FileEntity : EntityWithId
     public ICollection<FileTagEntity> FileTags { get; }
     public ICollection<FileLocationEntity> FileLocations { get; }
 
-    public static void OnModelCreating(ModelBuilder modelBuilder)
+    public new static void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<FileEntity>()
                     .HasMany(f => f.FileTags)

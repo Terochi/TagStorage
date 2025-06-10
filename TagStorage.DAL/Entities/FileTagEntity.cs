@@ -11,7 +11,7 @@ public class FileTagEntity : EntityWithTwoIds
         set => Id1 = value;
     }
 
-    public TagEntity Tag { get; }
+    public TagEntity Tag { get; set; }
 
     public Guid FileId
     {
@@ -19,9 +19,9 @@ public class FileTagEntity : EntityWithTwoIds
         set => Id2 = value;
     }
 
-    public FileEntity File { get; }
+    public FileEntity File { get; set; }
 
-    public static void OnModelCreating(ModelBuilder modelBuilder)
+    public new static void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<FileTagEntity>()
                     .Ignore(ft => ft.Id1)

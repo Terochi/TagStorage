@@ -6,6 +6,5 @@ public class FileEntityMapper : IEntityMapper<FileEntity>
 {
     public void MapToExistingEntity(FileEntity existingEntity, FileEntity newEntity)
     {
-        existingEntity.Id = newEntity.Id;
     }
 }

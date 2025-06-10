@@ -9,7 +9,7 @@ public class TaggingRuleEntity : EntityWithId
 
     public ICollection<AutoTagEntity> AutomaticTags { get; }
 
-    public static void OnModelCreating(ModelBuilder modelBuilder)
+    public new static void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TaggingRuleEntity>()
                     .HasMany(t => t.AutomaticTags)

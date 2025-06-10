@@ -11,7 +11,7 @@ public class TagChildEntity : EntityWithTwoIds
         set => Id1 = value;
     }
 
-    public TagEntity Child { get; }
+    public TagEntity Child { get; set; }
 
     public Guid ParentId
     {
@@ -19,9 +19,9 @@ public class TagChildEntity : EntityWithTwoIds
         set => Id2 = value;
     }
 
-    public TagEntity Parent { get; }
+    public TagEntity Parent { get; set; }
 
-    public static void OnModelCreating(ModelBuilder modelBuilder)
+    public new static void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TagChildEntity>()
                     .Ignore(tc => tc.Id1)

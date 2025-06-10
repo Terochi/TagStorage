@@ -10,11 +10,11 @@ public class FileLocationEntity : EntityWithId
     public required string Machine { get; set; }
 
     public Guid FileId { get; set; }
-    public FileEntity File { get; }
+    public FileEntity File { get; set; }
 
     public ICollection<ChangeEntity> Changes { get; }
 
-    public static void OnModelCreating(ModelBuilder modelBuilder)
+    public new static void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<FileLocationEntity>()
                     .HasOne(f => f.File)

@@ -5,13 +5,12 @@ namespace TagStorage.DAL.Entities;
 
 public class AutoTagEntity : EntityWithId
 {
-    public int Rule { get; set; }
     public required string Directory { get; set; }
 
     public Guid TagRuleId { get; set; }
-    public TaggingRuleEntity TagRule { get; }
+    public TaggingRuleEntity TagRule { get; set; }
 
-    public static void OnModelCreating(ModelBuilder modelBuilder)
+    public new static void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AutoTagEntity>()
                     .HasKey(e => e.Id);
