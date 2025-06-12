@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using TagStorage.Library.Entities;
 
@@ -16,7 +17,8 @@ public abstract partial class BaseRepository<TEntity> : IDependencyInjectionCand
 
     public virtual bool Exists(int id) => Get(id) != null;
 
-    public virtual TEntity? Get(int id)
+    [CanBeNull]
+    public virtual TEntity Get(int id)
     {
         return Connection.ExecuteQuery($"SELECT * FROM {TableName} WHERE id = {id};", MapEntity).FirstOrDefault();
     }

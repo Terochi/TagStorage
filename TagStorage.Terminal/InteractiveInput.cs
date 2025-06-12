@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using JetBrains.Annotations;
 
 namespace TagStorage.Terminal;
 
@@ -20,7 +21,8 @@ public class InteractiveInput<T>(Func<string, IEnumerable<T>> onChange, Func<T, 
         changedLines = changed.Select(printTransform);
     }
 
-    public T? ReadInput()
+    [CanBeNull]
+    public T ReadInput()
     {
         while (true)
         {

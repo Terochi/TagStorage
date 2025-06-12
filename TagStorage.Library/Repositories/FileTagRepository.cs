@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using JetBrains.Annotations;
 using TagStorage.Library.Entities;
 
 namespace TagStorage.Library.Repositories;
@@ -24,7 +25,8 @@ public partial class FileTagRepository : BaseRepository<FileTagEntity>
         return Connection.ExecuteQuery($"SELECT * FROM {TableName} WHERE tag = {tagId};", MapEntity);
     }
 
-    public virtual FileTagEntity? Get(FileTagEntity fileTag)
+    [CanBeNull]
+    public virtual FileTagEntity Get(FileTagEntity fileTag)
     {
         return Connection.ExecuteQuery($"SELECT * FROM {TableName} WHERE tag = {fileTag.Tag} AND file = {fileTag.File};", MapEntity).FirstOrDefault();
     }

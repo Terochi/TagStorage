@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using JetBrains.Annotations;
 using TagStorage.Library.Entities;
 
 namespace TagStorage.Library.Repositories;
@@ -14,7 +15,8 @@ public partial class TagChildRepository : BaseRepository<TagChildEntity>
             Parent = reader.GetInt32(1)
         };
 
-    public virtual TagChildEntity? Get(TagChildEntity tagChild)
+    [CanBeNull]
+    public virtual TagChildEntity Get(TagChildEntity tagChild)
     {
         return Connection.ExecuteQuery($"SELECT * FROM {TableName} WHERE child = {tagChild.Child} AND parent = {tagChild.Parent};", MapEntity).FirstOrDefault();
     }

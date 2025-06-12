@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
+using JetBrains.Annotations;
 using SHA = System.Security.Cryptography.SHA1;
 
 namespace TagStorage.Library.Helper;
@@ -36,7 +37,7 @@ public static class DirectoryUtils
         return (hash, totalSize);
     }
 
-    private static void addToFootprint(StringBuilder footprint, DirectoryInfo parent, ref long totalSize, int searchedPathLength = 0, Ignore.Ignore? ignore = null)
+    private static void addToFootprint(StringBuilder footprint, DirectoryInfo parent, ref long totalSize, int searchedPathLength = 0, [CanBeNull] Ignore.Ignore ignore = null)
     {
         if (++subfolderCounter >= max_subfolders_to_hash)
             return;
