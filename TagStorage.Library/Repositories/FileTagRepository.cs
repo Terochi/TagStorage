@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Specialized;
+using System.Data;
 using JetBrains.Annotations;
 using TagStorage.Library.Entities;
 
@@ -34,6 +35,7 @@ public partial class FileTagRepository : BaseRepository<FileTagEntity>
     public override void Delete(FileTagEntity fileTag)
     {
         Connection.ExecuteCommand($"DELETE FROM {TableName} WHERE tag = {fileTag.Tag} AND file = {fileTag.File};");
+        NotifyChange(NotifyCollectionChangedAction.Remove, fileTag);
     }
 
     public virtual bool Exists(FileTagEntity fileTag) => Get(fileTag) != null;

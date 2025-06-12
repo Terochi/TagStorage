@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Specialized;
+using System.Data;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using TagStorage.Library.Entities;
@@ -14,6 +15,10 @@ public abstract partial class BaseRepository<TEntity> : IDependencyInjectionCand
     protected DatabaseConnection Connection { get; private set; }
 
     protected abstract TEntity MapEntity(IDataReader reader);
+
+    public delegate void RepositoryChangeEventHandler(BaseRepository<TEntity> query, NotifyCollectionChangedEventArgs e);
+
+    public event RepositoryChangeEventHandler RepositoryChanged;
 
     public virtual bool Exists(int id) => Get(id) != null;
 
@@ -33,20 +38,28 @@ public abstract partial class BaseRepository<TEntity> : IDependencyInjectionCand
         string names = string.Join(", ", entity.GetFieldNames());
         string values = string.Join(", ", entity.GetFieldValues());
 
-        return Connection.ExecuteQuery($"INSERT INTO {TableName} ({names}) VALUES ({values}) RETURNING *;", MapEntity)
-                         .First();
+        var tEntity = Connection.ExecuteQuery($"INSERT INTO {TableName} ({names}) VALUES ({values}) RETURNING *;", MapEntity)
+                                .First();
+        NotifyChange(NotifyCollectionChangedAction.Add, tEntity);
+        return tEntity;
     }
 
     public virtual TEntity Update(TEntity entity)
     {
         string setClause = string.Join(", ", entity.GetFieldNames().Zip(entity.GetFieldValues(), (n, v) => $"{n} = {v}"));
 
-        return Connection.ExecuteQuery($"UPDATE {TableName} SET {setClause} WHERE id = {entity.Id} RETURNING *;", MapEntity)
-                         .First();
+        var tEntity = Connection.ExecuteQuery($"UPDATE {TableName} SET {setClause} WHERE id = {entity.Id} RETURNING *;", MapEntity)
+                                .First();
+        NotifyChange(NotifyCollectionChangedAction.Replace, tEntity);
+        return tEntity;
     }
 
     public virtual void Delete(TEntity entity)
     {
         Connection.ExecuteCommand($"DELETE FROM {TableName} WHERE id = {entity.Id};");
+        NotifyChange(NotifyCollectionChangedAction.Remove, entity);
     }
+
+    protected void NotifyChange(NotifyCollectionChangedAction action, TEntity entity) =>
+        RepositoryChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, entity));
 }

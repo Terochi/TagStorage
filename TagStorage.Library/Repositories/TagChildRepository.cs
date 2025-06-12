@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Specialized;
+using System.Data;
 using JetBrains.Annotations;
 using TagStorage.Library.Entities;
 
@@ -24,6 +25,7 @@ public partial class TagChildRepository : BaseRepository<TagChildEntity>
     public override void Delete(TagChildEntity tagChild)
     {
         Connection.ExecuteCommand($"DELETE FROM {TableName} WHERE child = {tagChild.Child} AND parent = {tagChild.Parent};");
+        NotifyChange(NotifyCollectionChangedAction.Remove, tagChild);
     }
 
     public virtual bool Exists(TagChildEntity tagChild) => Get(tagChild) != null;

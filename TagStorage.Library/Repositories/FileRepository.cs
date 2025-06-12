@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Specialized;
+using System.Data;
 using TagStorage.Library.Entities;
 
 namespace TagStorage.Library.Repositories;
@@ -15,7 +16,9 @@ public partial class FileRepository : BaseRepository<FileEntity>
 
     public override FileEntity Insert(FileEntity entity)
     {
-        return Connection.ExecuteQuery($"INSERT INTO {TableName} DEFAULT VALUES RETURNING *;", MapEntity)
-                         .First();
+        var fileEntity = Connection.ExecuteQuery($"INSERT INTO {TableName} DEFAULT VALUES RETURNING *;", MapEntity)
+                                   .First();
+        NotifyChange(NotifyCollectionChangedAction.Add, fileEntity);
+        return fileEntity;
     }
 }
