@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -18,6 +19,9 @@ public partial class TagFacade : IFacadeBase
     private ChangeRepository changes { get; set; }
 
     [Resolved]
+    private TagChildRepository tagChildren { get; set; }
+
+    [Resolved]
     private FileRepository files { get; set; }
 
     [Resolved]
@@ -32,6 +36,7 @@ public partial class TagFacade : IFacadeBase
     private void load()
     {
         registerRepositoryChange(tags, Tags);
+        Tags.AddRange(tags.Get());
     }
 
     private void registerRepositoryChange<TRepository, TEntity>(TRepository repository, BindableList<TEntity> entities)
@@ -90,9 +95,25 @@ public partial class TagFacade : IFacadeBase
         return Get().Where(t => t.Name.FuzzyMatch(name));
     }
 
+    [CanBeNull]
+    public TagEntity Get(int id)
+    {
+        return Get().FirstOrDefault(t => t.Id == id);
+    }
+
     public IEnumerable<TagEntity> GetExact(string name)
     {
         return Get().Where(t => t.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public IEnumerable<TagEntity> GetParents(TagEntity tag)
+    {
+        return tagChildren.GetParents(tag.Id).Select(tc => Get(tc.Parent)).Where(t => t != null);
+    }
+
+    public IEnumerable<TagEntity> GetChildren(TagEntity tag)
+    {
+        return tagChildren.GetChildren(tag.Id).Select(tc => Get(tc.Child)).Where(t => t != null);
     }
 
     public TagEntity Insert(string tagName)
@@ -104,6 +125,32 @@ public partial class TagFacade : IFacadeBase
     public void Delete(TagEntity tag)
     {
         tags.Delete(tag);
+    }
+
+    public bool LinkTags(TagEntity child, TagEntity parent)
+    {
+        var tagChild = new TagChildEntity
+        {
+            Child = child.Id,
+            Parent = parent.Id
+        };
+        if (tagChildren.Exists(tagChild)) return false;
+
+        tagChildren.Insert(tagChild);
+        return true;
+    }
+
+    public bool UnlinkTags(TagEntity child, TagEntity parent)
+    {
+        var tagChild = new TagChildEntity
+        {
+            Child = child.Id,
+            Parent = parent.Id
+        };
+        if (!tagChildren.Exists(tagChild)) return false;
+
+        tagChildren.Delete(tagChild);
+        return true;
     }
 
     public IEnumerable<FileLocationEntity> GetFileSelectedTags(IEnumerable<TagEntity> selectedTags)

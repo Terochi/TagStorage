@@ -39,7 +39,7 @@ public partial class DirectorySelectionContainer : SelectionContainer<string>
         var directoryInfo = new DirectoryInfo(item);
         var fileInfo = new FileInfo(item);
 
-        if (directoryInfo.Exists && !directoryInfo.FullName.EndsWith(":\\"))
+        if (directoryInfo.Exists && !directoryInfo.FullName.EndsWith(":\\", StringComparison.Ordinal))
         {
             var selectionItem = new DirectorySelectionItem(directoryInfo.Name);
             selectionItem.CurrentDirectory.Value = directoryInfo.Parent!.FullName;

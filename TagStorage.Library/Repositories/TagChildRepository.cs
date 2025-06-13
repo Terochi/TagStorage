@@ -17,9 +17,21 @@ public partial class TagChildRepository : BaseRepository<TagChildEntity>
         };
 
     [CanBeNull]
-    public virtual TagChildEntity Get(TagChildEntity tagChild)
+    public TagChildEntity Get(TagChildEntity tagChild)
     {
         return Connection.ExecuteQuery($"SELECT * FROM {TableName} WHERE child = {tagChild.Child} AND parent = {tagChild.Parent};", MapEntity).FirstOrDefault();
+    }
+
+    [CanBeNull]
+    public IEnumerable<TagChildEntity> GetParents(int childId)
+    {
+        return Connection.ExecuteQuery($"SELECT * FROM {TableName} WHERE child = {childId};", MapEntity);
+    }
+
+    [CanBeNull]
+    public IEnumerable<TagChildEntity> GetChildren(int parentId)
+    {
+        return Connection.ExecuteQuery($"SELECT * FROM {TableName} WHERE parent = {parentId};", MapEntity);
     }
 
     public override void Delete(TagChildEntity tagChild)
