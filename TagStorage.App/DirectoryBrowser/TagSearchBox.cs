@@ -63,6 +63,11 @@ public partial class TagSearchBox : CompositeDrawable
 
         taglist.Clicked += clicked;
 
+        tags.Tags.BindCollectionChanged((_, _) =>
+        {
+            taglist.LoadTags(tags.Get(textbox.Text));
+        });
+
         textbox.Current.BindValueChanged(text =>
         {
             taglist.LoadTags(tags.Get(text.NewValue));
@@ -72,7 +77,6 @@ public partial class TagSearchBox : CompositeDrawable
     private void clicked(Tag sender)
     {
         tags.Delete(sender.Entity);
-        taglist.LoadTags(tags.Get(textbox.Current.Value));
     }
 
     public override void Show()

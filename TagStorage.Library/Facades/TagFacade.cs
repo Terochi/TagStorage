@@ -1,4 +1,6 @@
-﻿using osu.Framework.Allocation;
+﻿using System.Collections.Specialized;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using TagStorage.Library.Entities;
@@ -24,9 +26,63 @@ public partial class TagFacade : IFacadeBase
     [Resolved]
     private FileTagRepository fileTags { get; set; }
 
+    public BindableList<TagEntity> Tags { get; } = new BindableList<TagEntity>();
+
+    [BackgroundDependencyLoader]
+    private void load()
+    {
+        registerRepositoryChange(tags, Tags);
+    }
+
+    private void registerRepositoryChange<TRepository, TEntity>(TRepository repository, BindableList<TEntity> entities)
+        where TRepository : BaseRepository<TEntity>
+        where TEntity : class, IEntity
+    {
+        repository.RepositoryChanged += (_, e) =>
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+
+                    foreach (var tag in e.NewItems.Cast<TEntity>())
+                    {
+                        entities.Add(tag);
+                    }
+
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var tag in e.OldItems.Cast<TEntity>())
+                    {
+                        entities.Remove(tag);
+                    }
+
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    foreach (var tag in e.OldItems.Cast<TEntity>())
+                    {
+                        entities.Remove(tag);
+                    }
+
+                    foreach (var tag in e.NewItems.Cast<TEntity>())
+                    {
+                        entities.Add(tag);
+                    }
+
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    entities.Clear();
+                    entities.AddRange(repository.Get());
+                    break;
+            }
+        };
+    }
+
     public IEnumerable<TagEntity> Get()
     {
-        return tags.Get();
+        return Tags;
     }
 
     public IEnumerable<TagEntity> Get(string name)

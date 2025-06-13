@@ -78,6 +78,11 @@ public partial class TagSearch : CompositeDrawable
         taglist.Clicked += selectTag;
         textbox.OnCommit += onCommit;
 
+        tags.Tags.BindCollectionChanged((_, _) =>
+        {
+            loadTags();
+        });
+
         textbox.Current.BindValueChanged(_ =>
         {
             loadTags();
